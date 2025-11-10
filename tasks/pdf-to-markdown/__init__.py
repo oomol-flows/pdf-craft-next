@@ -88,6 +88,7 @@ def main(params: Inputs, context: Context) -> Outputs:
                 "progress": 0,
                 "message": f"Starting OCR processing ({total_pages} pages)..."
             })
+            print(f"[PDF-to-Markdown] Starting conversion of {total_pages} pages")
         elif kind == OCREventKind.SKIP or kind == OCREventKind.IGNORE:
             # Track progress through processed pages
             total_pages = event.total_pages
@@ -97,11 +98,13 @@ def main(params: Inputs, context: Context) -> Outputs:
                 "progress": progress,
                 "message": f"Processing page {current_page}/{total_pages}"
             })
+            print(f"[PDF-to-Markdown] Page {current_page}/{total_pages} completed ({progress:.1f}%)")
         elif kind == OCREventKind.COMPLETE:
             context.report_progress({
                 "progress": 100,
                 "message": "PDF to Markdown conversion completed"
             })
+            print(f"[PDF-to-Markdown] Conversion completed successfully")
 
     # Perform the conversion
     transform_markdown(

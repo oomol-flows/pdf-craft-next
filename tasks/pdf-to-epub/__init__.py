@@ -118,6 +118,7 @@ def main(params: Inputs, context: Context) -> Outputs:
                 "progress": 0,
                 "message": f"Starting OCR processing ({total_pages} pages)..."
             })
+            print(f"[PDF-to-EPUB] Starting conversion of {total_pages} pages")
         elif kind == OCREventKind.SKIP or kind == OCREventKind.IGNORE:
             # Track progress through processed pages
             total_pages = event.total_pages
@@ -127,11 +128,13 @@ def main(params: Inputs, context: Context) -> Outputs:
                 "progress": progress,
                 "message": f"Processing page {current_page}/{total_pages}"
             })
+            print(f"[PDF-to-EPUB] Page {current_page}/{total_pages} completed ({progress:.1f}%)")
         elif kind == OCREventKind.COMPLETE:
             context.report_progress({
                 "progress": 100,
                 "message": "PDF to EPUB conversion completed"
             })
+            print(f"[PDF-to-EPUB] Conversion completed successfully")
 
     # Get OCR model size (default to gundam for best quality)
     ocr_model = params.get("ocr_model", "gundam")
