@@ -23,25 +23,13 @@ torch.backends.cudnn.allow_tf32 = True        # Enable TF32 for cuDNN operations
 torch.backends.cudnn.benchmark = True          # Enable cuDNN auto-tuner for optimal performance
 
 
-def safe_report_progress(context: Context, progress):
-    """
-    Safely report progress to context, ensuring NaN values are converted to 0.
-
-    Args:
-        context: OOMOL context object
-        progress: Progress value (int, float, or dict with 'progress' key)
-    """
-    if isinstance(progress, dict):
-        # Handle dict format with progress key
-        progress_value = progress.get("progress", 0)
-        if progress_value is None or (isinstance(progress_value, float) and math.isnan(progress_value)):
-            progress["progress"] = 0
-        context.report_progress(progress)
-    else:
-        # Handle numeric format
-        if progress is None or (isinstance(progress, float) and math.isnan(progress)):
-            progress = 0
-        context.report_progress(progress)
+def safe_progress_value(value):
+    """Convert progress value to safe integer, replacing NaN with 0."""
+    if value is None:
+        return 0
+    if isinstance(value, float) and math.isnan(value):
+        return 0
+    return int(value)
 
 
 def main(params: Inputs, context: Context) -> Outputs:
@@ -76,7 +64,7 @@ def main(params: Inputs, context: Context) -> Outputs:
     # Log GPU information
     gpu_name = torch.cuda.get_device_name(0)
     cuda_version = torch.version.cuda
-    safe_report_progress(context, {
+    context.report_progress({
         "progress": 0,
         "message": f"Using GPU: {gpu_name} (CUDA {cuda_version})"
     })
@@ -105,37 +93,25 @@ def main(params: Inputs, context: Context) -> Outputs:
     def on_ocr_event(event):
         kind = OCREventKind(event.kind)
         total_pages = event.total_pages
-        current_page = event.page_index + 1  # Convert 0-based index to 1-based page number
+        current_page = event.page_index + 1
 
-        # Calculate progress percentage with NaN protection
-        if total_pages > 0:
-            progress_percent = int((current_page / total_pages) * 100)
-        else:
-            progress_percent = 0
-
-        # Ensure progress_percent is valid (not NaN or None) for both reporting and printing
-        if progress_percent is None or (isinstance(progress_percent, float) and math.isnan(progress_percent)):
-            progress_percent = 0
+        # Calculate progress percentage - safe_progress_value handles NaN/None
+        progress_percent = safe_progress_value((current_page / total_pages * 100) if total_pages > 0 else 0)
 
         if kind == OCREventKind.START:
-            if current_page == 1:  # Only print once at the very beginning
-                safe_report_progress(context, 0)
+            if current_page == 1:
+                context.report_progress(0)
                 print(f"[PDF-to-Markdown] Starting conversion of {total_pages} pages")
         elif kind == OCREventKind.SKIP:
-            # Page already exists in cache, skipped
-            safe_report_progress(context, progress_percent)
+            context.report_progress(progress_percent)
             print(f"[PDF-to-Markdown] Page {current_page}/{total_pages} skipped (cached) - {progress_percent}%")
         elif kind == OCREventKind.IGNORE:
-            # Page not in processing range, ignored
-            safe_report_progress(context, progress_percent)
+            context.report_progress(progress_percent)
             print(f"[PDF-to-Markdown] Page {current_page}/{total_pages} ignored - {progress_percent}%")
         elif kind == OCREventKind.COMPLETE:
-            # Page OCR completed successfully
-            safe_report_progress(context, progress_percent)
-            cost_time = event.cost_time_ms / 1000  # Convert to seconds
+            context.report_progress(progress_percent)
+            cost_time = event.cost_time_ms / 1000
             print(f"[PDF-to-Markdown] Page {current_page}/{total_pages} completed in {cost_time:.2f}s - {progress_percent}%")
-
-            # Print final completion message when all pages are done
             if current_page == total_pages:
                 print(f"[PDF-to-Markdown] All {total_pages} pages converted successfully!")
 
