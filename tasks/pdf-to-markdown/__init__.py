@@ -13,6 +13,7 @@ class Outputs(typing.TypedDict):
 from pathlib import Path
 from oocana import Context
 from pdf_craft import transform_markdown, OCREventKind
+import torch
 
 
 def main(params: Inputs, context: Context) -> Outputs:
@@ -36,6 +37,22 @@ def main(params: Inputs, context: Context) -> Outputs:
             - markdown_path: Path to the generated markdown file
             - assets_dir: Directory containing extracted images
     """
+    # Check for CUDA/GPU availability
+    if not torch.cuda.is_available():
+        raise RuntimeError(
+            "CUDA/GPU is required for PDF conversion. "
+            "This task requires an NVIDIA GPU with CUDA support. "
+            "Please ensure you have a compatible GPU and CUDA drivers installed."
+        )
+
+    # Log GPU information
+    gpu_name = torch.cuda.get_device_name(0)
+    cuda_version = torch.version.cuda
+    context.report_progress({
+        "progress": 0,
+        "message": f"Using GPU: {gpu_name} (CUDA {cuda_version})"
+    })
+
     # Convert paths to Path objects
     pdf_path = Path(params["pdf_path"])
     output_dir = Path(params["output_dir"])
@@ -60,14 +77,25 @@ def main(params: Inputs, context: Context) -> Outputs:
     def on_ocr_event(event):
         kind = OCREventKind(event.kind)
         if kind == OCREventKind.START:
-            context.report_progress(0, "Starting OCR processing...")
-        elif kind == OCREventKind.PROGRESS:
+            total_pages = event.total or 0
+            context.report_progress({
+                "progress": 0,
+                "message": f"Starting OCR processing ({total_pages} pages)..."
+            })
+        elif kind == OCREventKind.SKIP or kind == OCREventKind.IGNORE:
+            # Track progress through processed pages
             total_pages = event.total or 1
             current_page = event.current or 0
             progress = (current_page / total_pages) * 100
-            context.report_progress(progress, f"Processing page {current_page}/{total_pages}")
+            context.report_progress({
+                "progress": progress,
+                "message": f"Processing page {current_page}/{total_pages}"
+            })
         elif kind == OCREventKind.COMPLETE:
-            context.report_progress(100, "PDF to Markdown conversion completed")
+            context.report_progress({
+                "progress": 100,
+                "message": "PDF to Markdown conversion completed"
+            })
 
     # Perform the conversion
     transform_markdown(
