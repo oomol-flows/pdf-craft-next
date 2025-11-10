@@ -18,6 +18,28 @@ from pathlib import Path
 from oocana import Context
 from pdf_craft import transform_epub, OCREventKind, TableRender, LaTeXRender, BookMeta
 import torch
+import math
+
+
+def safe_report_progress(context: Context, progress):
+    """
+    Safely report progress to context, ensuring NaN values are converted to 0.
+
+    Args:
+        context: OOMOL context object
+        progress: Progress value (int, float, or dict with 'progress' key)
+    """
+    if isinstance(progress, dict):
+        # Handle dict format with progress key
+        progress_value = progress.get("progress", 0)
+        if progress_value is None or (isinstance(progress_value, float) and math.isnan(progress_value)):
+            progress["progress"] = 0
+        context.report_progress(progress)
+    else:
+        # Handle numeric format
+        if progress is None or (isinstance(progress, float) and math.isnan(progress)):
+            progress = 0
+        context.report_progress(progress)
 
 
 def main(params: Inputs, context: Context) -> Outputs:
@@ -63,7 +85,7 @@ def main(params: Inputs, context: Context) -> Outputs:
     # Log GPU information
     gpu_name = torch.cuda.get_device_name(0)
     cuda_version = torch.version.cuda
-    context.report_progress({
+    safe_report_progress(context, {
         "progress": 0,
         "message": f"Using GPU: {gpu_name} (CUDA {cuda_version}) with TF32 and cuDNN optimizations enabled"
     })
@@ -121,25 +143,25 @@ def main(params: Inputs, context: Context) -> Outputs:
         else:
             progress_percent = 0
 
-        # Ensure progress_percent is valid (not NaN or None)
-        if progress_percent is None or (isinstance(progress_percent, float) and progress_percent != progress_percent):
+        # Ensure progress_percent is valid (not NaN or None) for both reporting and printing
+        if progress_percent is None or (isinstance(progress_percent, float) and math.isnan(progress_percent)):
             progress_percent = 0
 
         if kind == OCREventKind.START:
             if current_page == 1:  # Only print once at the very beginning
-                context.report_progress(0)
+                safe_report_progress(context, 0)
                 print(f"[PDF-to-EPUB] Starting conversion of {total_pages} pages")
         elif kind == OCREventKind.SKIP:
             # Page already exists in cache, skipped
-            context.report_progress(progress_percent)
+            safe_report_progress(context, progress_percent)
             print(f"[PDF-to-EPUB] Page {current_page}/{total_pages} skipped (cached) - {progress_percent}%")
         elif kind == OCREventKind.IGNORE:
             # Page not in processing range, ignored
-            context.report_progress(progress_percent)
+            safe_report_progress(context, progress_percent)
             print(f"[PDF-to-EPUB] Page {current_page}/{total_pages} ignored - {progress_percent}%")
         elif kind == OCREventKind.COMPLETE:
             # Page OCR completed successfully
-            context.report_progress(progress_percent)
+            safe_report_progress(context, progress_percent)
             cost_time = event.cost_time_ms / 1000  # Convert to seconds
             print(f"[PDF-to-EPUB] Page {current_page}/{total_pages} completed in {cost_time:.2f}s - {progress_percent}%")
 
