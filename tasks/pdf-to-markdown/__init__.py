@@ -15,6 +15,12 @@ from oocana import Context
 from pdf_craft import transform_markdown, OCREventKind
 import torch
 
+# Enable PyTorch performance optimizations for NVIDIA GPUs
+# These settings significantly improve GPU utilization on Ampere and later architectures (RTX 30/40 series)
+torch.backends.cuda.matmul.allow_tf32 = True  # Enable TensorFloat-32 for matrix operations
+torch.backends.cudnn.allow_tf32 = True        # Enable TF32 for cuDNN operations
+torch.backends.cudnn.benchmark = True          # Enable cuDNN auto-tuner for optimal performance
+
 
 def main(params: Inputs, context: Context) -> Outputs:
     """

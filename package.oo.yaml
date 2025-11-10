@@ -5,4 +5,5 @@ scripts:
   bootstrap: |
     npm install
     pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+    pip install timm accelerate
     poetry install --no-root
