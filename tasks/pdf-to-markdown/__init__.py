@@ -85,23 +85,30 @@ def main(params: Inputs, context: Context) -> Outputs:
         total_pages = event.total_pages
         current_page = event.page_index + 1  # Convert 0-based index to 1-based page number
 
+        # Calculate progress percentage with NaN protection
+        if total_pages > 0:
+            progress_percent = int((current_page / total_pages) * 100)
+        else:
+            progress_percent = 0
+
+        # Ensure progress_percent is valid (not NaN or None)
+        if progress_percent is None or (isinstance(progress_percent, float) and progress_percent != progress_percent):
+            progress_percent = 0
+
         if kind == OCREventKind.START:
             if current_page == 1:  # Only print once at the very beginning
                 context.report_progress(0)
                 print(f"[PDF-to-Markdown] Starting conversion of {total_pages} pages")
         elif kind == OCREventKind.SKIP:
             # Page already exists in cache, skipped
-            progress_percent = int((current_page / total_pages) * 100) if total_pages > 0 else 0
             context.report_progress(progress_percent)
             print(f"[PDF-to-Markdown] Page {current_page}/{total_pages} skipped (cached) - {progress_percent}%")
         elif kind == OCREventKind.IGNORE:
             # Page not in processing range, ignored
-            progress_percent = int((current_page / total_pages) * 100) if total_pages > 0 else 0
             context.report_progress(progress_percent)
             print(f"[PDF-to-Markdown] Page {current_page}/{total_pages} ignored - {progress_percent}%")
         elif kind == OCREventKind.COMPLETE:
             # Page OCR completed successfully
-            progress_percent = int((current_page / total_pages) * 100) if total_pages > 0 else 0
             context.report_progress(progress_percent)
             cost_time = event.cost_time_ms / 1000  # Convert to seconds
             print(f"[PDF-to-Markdown] Page {current_page}/{total_pages} completed in {cost_time:.2f}s - {progress_percent}%")
