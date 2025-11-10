@@ -1,18 +1,16 @@
 #region generated meta
 import typing
-
 class Inputs(typing.TypedDict):
     pdf_path: str
     output_dir: str
     book_title: str
     book_authors: str
     includes_footnotes: bool
-    table_render: typing.NotRequired[str]
-    latex_render: typing.NotRequired[str]
-    generate_plot: typing.NotRequired[bool]
-
+    table_render: typing.Literal["HTML", "Markdown"] | None
+    latex_render: typing.Literal["MathML", "LaTeX"] | None
+    generate_plot: bool | None
 class Outputs(typing.TypedDict):
-    epub_path: str
+    epub_path: typing.NotRequired[str]
 #endregion
 
 from pathlib import Path

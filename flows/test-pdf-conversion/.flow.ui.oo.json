@@ -1,0 +1,20 @@
+{
+  "nodes": {
+    "pdf-to-markdown#1": {
+      "rfNode": {
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    "pdf-to-epub#1": {
+      "rfNode": {
+        "position": {
+          "x": 600,
+          "y": 0
+        }
+      }
+    }
+  }
+}
