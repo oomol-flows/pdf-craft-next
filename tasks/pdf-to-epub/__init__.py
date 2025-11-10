@@ -105,16 +105,16 @@ def main(params: Inputs, context: Context) -> Outputs:
     def on_ocr_event(event):
         kind = OCREventKind(event.kind)
         if kind == OCREventKind.START:
-            total_pages = event.total or 0
+            total_pages = event.total_pages
             context.report_progress({
                 "progress": 0,
                 "message": f"Starting OCR processing ({total_pages} pages)..."
             })
         elif kind == OCREventKind.SKIP or kind == OCREventKind.IGNORE:
             # Track progress through processed pages
-            total_pages = event.total or 1
-            current_page = event.current or 0
-            progress = (current_page / total_pages) * 100
+            total_pages = event.total_pages
+            current_page = event.page_index + 1  # Convert 0-based index to 1-based page number
+            progress = (current_page / total_pages) * 100 if total_pages > 0 else 0
             context.report_progress({
                 "progress": progress,
                 "message": f"Processing page {current_page}/{total_pages}"
