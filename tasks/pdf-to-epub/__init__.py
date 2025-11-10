@@ -117,36 +117,24 @@ def main(params: Inputs, context: Context) -> Outputs:
 
         if kind == OCREventKind.START:
             if current_page == 1:  # Only print once at the very beginning
-                context.report_progress({
-                    "progress": 0,
-                    "message": f"Starting OCR processing ({total_pages} pages)..."
-                })
+                context.report_progress(0)
                 print(f"[PDF-to-EPUB] Starting conversion of {total_pages} pages")
         elif kind == OCREventKind.SKIP:
             # Page already exists in cache, skipped
-            progress = (current_page / total_pages) * 100 if total_pages > 0 else 0
-            context.report_progress({
-                "progress": progress,
-                "message": f"Processing page {current_page}/{total_pages}"
-            })
-            print(f"[PDF-to-EPUB] Page {current_page}/{total_pages} skipped (cached) - {progress:.1f}%")
+            progress_percent = int((current_page / total_pages) * 100) if total_pages > 0 else 0
+            context.report_progress(progress_percent)
+            print(f"[PDF-to-EPUB] Page {current_page}/{total_pages} skipped (cached) - {progress_percent}%")
         elif kind == OCREventKind.IGNORE:
             # Page not in processing range, ignored
-            progress = (current_page / total_pages) * 100 if total_pages > 0 else 0
-            context.report_progress({
-                "progress": progress,
-                "message": f"Processing page {current_page}/{total_pages}"
-            })
-            print(f"[PDF-to-EPUB] Page {current_page}/{total_pages} ignored - {progress:.1f}%")
+            progress_percent = int((current_page / total_pages) * 100) if total_pages > 0 else 0
+            context.report_progress(progress_percent)
+            print(f"[PDF-to-EPUB] Page {current_page}/{total_pages} ignored - {progress_percent}%")
         elif kind == OCREventKind.COMPLETE:
             # Page OCR completed successfully
-            progress = (current_page / total_pages) * 100 if total_pages > 0 else 0
-            context.report_progress({
-                "progress": progress,
-                "message": f"Processing page {current_page}/{total_pages}"
-            })
+            progress_percent = int((current_page / total_pages) * 100) if total_pages > 0 else 0
+            context.report_progress(progress_percent)
             cost_time = event.cost_time_ms / 1000  # Convert to seconds
-            print(f"[PDF-to-EPUB] Page {current_page}/{total_pages} completed in {cost_time:.2f}s - {progress:.1f}%")
+            print(f"[PDF-to-EPUB] Page {current_page}/{total_pages} completed in {cost_time:.2f}s - {progress_percent}%")
 
             # Print final completion message when all pages are done
             if current_page == total_pages:
