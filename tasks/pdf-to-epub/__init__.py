@@ -73,10 +73,7 @@ def main(params: Inputs, context: Context) -> Outputs:
     # Log GPU information
     gpu_name = torch.cuda.get_device_name(0)
     cuda_version = torch.version.cuda
-    context.report_progress({
-        "progress": 0,
-        "message": f"Using GPU: {gpu_name} (CUDA {cuda_version}) with TF32 and cuDNN optimizations enabled"
-    })
+    context.report_progress(0)
 
     # Convert paths to Path objects
     pdf_path = Path(params["pdf_path"])
@@ -127,7 +124,7 @@ def main(params: Inputs, context: Context) -> Outputs:
 
         # Calculate progress percentage - safe_progress_value handles NaN/None
         progress_percent = safe_progress_value((current_page / total_pages * 100) if total_pages > 0 else 0)
-
+        context.report_progress(0)
         if kind == OCREventKind.START:
             if current_page == 1:
                 context.report_progress(0)
@@ -144,6 +141,7 @@ def main(params: Inputs, context: Context) -> Outputs:
             print(f"[PDF-to-EPUB] Page {current_page}/{total_pages} completed in {cost_time:.2f}s - {progress_percent}%")
             if current_page == total_pages:
                 print(f"[PDF-to-EPUB] All {total_pages} pages converted successfully!")
+      
 
     # Get OCR model size (default to gundam for best quality)
     ocr_model = params.get("ocr_model", "gundam")

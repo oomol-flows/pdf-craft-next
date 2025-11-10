@@ -32,6 +32,27 @@ def safe_progress_value(value):
     return int(value)
 
 
+def log_progress_report(progress_percent: int, message: str, business_context: str = ""):
+    """
+    Log progress report for debugging and issue tracking.
+
+    Parameters:
+        progress_percent: Progress percentage (0-100)
+        message: Progress message to display
+        business_context: Additional business context for debugging
+    """
+    import time
+
+    print(f"[PDF-to-Markdown] PROGRESS UPDATE: {progress_percent}% | MESSAGE: {message}")
+    if business_context:
+        print(f"[PDF-to-Markdown] BUSINESS CONTEXT: {business_context}")
+
+    # Show timing information
+    timestamp = time.strftime("%H:%M:%S", time.localtime())
+    gpu_mode = f"GPU ({torch.cuda.get_device_name(0)})" if torch.cuda.is_available() else "CPU Mode"
+    print(f"[PDF-to-Markdown] TIMESTAMP: {timestamp} | MODE: {gpu_mode}")
+
+
 def main(params: Inputs, context: Context) -> Outputs:
     """
     Convert PDF document to Markdown format with image extraction.
@@ -64,10 +85,11 @@ def main(params: Inputs, context: Context) -> Outputs:
     # Log GPU information
     gpu_name = torch.cuda.get_device_name(0)
     cuda_version = torch.version.cuda
-    context.report_progress({
-        "progress": 0,
-        "message": f"Using GPU: {gpu_name} (CUDA {cuda_version})"
-    })
+    gpu_message = f"Using GPU: {gpu_name} (CUDA {cuda_version})"
+
+    # Log progress with business context
+    log_progress_report(0, gpu_message, "GPU initialization and CUDA availability check")
+    context.report_progress(0)
 
     # Convert paths to Path objects
     pdf_path = Path(params["pdf_path"])
@@ -89,6 +111,12 @@ def main(params: Inputs, context: Context) -> Outputs:
     includes_footnotes = params.get("includes_footnotes", True)
     generate_plot = params.get("generate_plot", False)
 
+    # Log conversion start with business context
+    start_message = f"Initializing PDF-to-Markdown conversion"
+    start_context = f"PDF: {pdf_path.name} | Output: {output_dir} | Footnotes: {includes_footnotes} | Plots: {generate_plot}"
+    log_progress_report(0, start_message, start_context)
+    print(f"[PDF-to-Markdown] {start_message}")
+
     # Progress tracking callback
     def on_ocr_event(event):
         kind = OCREventKind(event.kind)
@@ -97,23 +125,52 @@ def main(params: Inputs, context: Context) -> Outputs:
 
         # Calculate progress percentage - safe_progress_value handles NaN/None
         progress_percent = safe_progress_value((current_page / total_pages * 100) if total_pages > 0 else 0)
-
+        context.report_progress(0)
         if kind == OCREventKind.START:
             if current_page == 1:
+                message = f"Starting conversion of {total_pages} pages"
+                business_context = f"OCR initialization - processing PDF with {total_pages} total pages"
+
+                # Log detailed progress information
+                log_progress_report(0, message, business_context)
                 context.report_progress(0)
-                print(f"[PDF-to-Markdown] Starting conversion of {total_pages} pages")
+                print(f"[PDF-to-Markdown] {message}")
+
         elif kind == OCREventKind.SKIP:
+            message = f"Page {current_page}/{total_pages} skipped (cached)"
+            business_context = f"OCR cache hit - page {current_page} already processed, skipping GPU computation"
+
+            # Log detailed progress information
+            log_progress_report(progress_percent, message, business_context)
             context.report_progress(progress_percent)
-            print(f"[PDF-to-Markdown] Page {current_page}/{total_pages} skipped (cached) - {progress_percent}%")
+            print(f"[PDF-to-Markdown] {message} - {progress_percent}%")
+
         elif kind == OCREventKind.IGNORE:
+            message = f"Page {current_page}/{total_pages} ignored"
+            business_context = f"OCR ignored - page {current_page} marked for ignoring, likely due to format or content"
+
+            # Log detailed progress information
+            log_progress_report(progress_percent, message, business_context)
             context.report_progress(progress_percent)
-            print(f"[PDF-to-Markdown] Page {current_page}/{total_pages} ignored - {progress_percent}%")
+            print(f"[PDF-to-Markdown] {message} - {progress_percent}%")
+
         elif kind == OCREventKind.COMPLETE:
-            context.report_progress(progress_percent)
             cost_time = event.cost_time_ms / 1000
-            print(f"[PDF-to-Markdown] Page {current_page}/{total_pages} completed in {cost_time:.2f}s - {progress_percent}%")
+            message = f"Page {current_page}/{total_pages} completed in {cost_time:.2f}s"
+            business_context = f"OCR processing complete - page {current_page} successfully converted, GPU time: {cost_time:.2f}s"
+
+            # Log detailed progress information
+            log_progress_report(progress_percent, message, business_context)
+            context.report_progress(progress_percent)
+            print(f"[PDF-to-Markdown] {message} - {progress_percent}%")
+
             if current_page == total_pages:
-                print(f"[PDF-to-Markdown] All {total_pages} pages converted successfully!")
+                complete_message = f"All {total_pages} pages converted successfully!"
+                complete_context = f"PDF-to-Markdown conversion complete - total {total_pages} pages processed, GPU utilization optimized"
+
+                # Final completion log
+                log_progress_report(100, complete_message, complete_context)
+                print(f"[PDF-to-Markdown] {complete_message}")
 
     # Perform the conversion
     transform_markdown(
