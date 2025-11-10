@@ -4,6 +4,8 @@ scripts:
   # eg: bootstrap: poetry add pandas
   bootstrap: |
     npm install
-    pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+    pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121
+    pip install "numpy<2.0"
     pip install timm accelerate
+    pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.3.6/flash_attn-2.3.6+cu122torch2.1cxx11abiFALSE-cp311-cp311-linux_x86_64.whl
     poetry install --no-root
