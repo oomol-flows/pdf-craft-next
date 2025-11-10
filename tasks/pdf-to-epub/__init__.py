@@ -9,6 +9,7 @@ class Inputs(typing.TypedDict):
     table_render: typing.Literal["HTML", "Markdown"] | None
     latex_render: typing.Literal["MathML", "LaTeX"] | None
     generate_plot: bool | None
+    ocr_model: typing.Literal["gundam", "large", "base", "small", "tiny"] | None
 class Outputs(typing.TypedDict):
     epub_path: typing.NotRequired[str]
 #endregion
@@ -50,12 +51,21 @@ def main(params: Inputs, context: Context) -> Outputs:
             "Please ensure you have a compatible GPU and CUDA drivers installed."
         )
 
+    # Enable GPU performance optimizations
+    # Enable cuDNN benchmark mode for automatic algorithm selection
+    torch.backends.cudnn.benchmark = True
+    # Enable TF32 for faster computation on Ampere GPUs (RTX 30xx/40xx)
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cudnn.allow_tf32 = True
+    # Set memory allocation strategy for better GPU utilization
+    torch.cuda.empty_cache()
+
     # Log GPU information
     gpu_name = torch.cuda.get_device_name(0)
     cuda_version = torch.version.cuda
     context.report_progress({
         "progress": 0,
-        "message": f"Using GPU: {gpu_name} (CUDA {cuda_version})"
+        "message": f"Using GPU: {gpu_name} (CUDA {cuda_version}) with TF32 and cuDNN optimizations enabled"
     })
 
     # Convert paths to Path objects
@@ -123,11 +133,15 @@ def main(params: Inputs, context: Context) -> Outputs:
                 "message": "PDF to EPUB conversion completed"
             })
 
+    # Get OCR model size (default to gundam for best quality)
+    ocr_model = params.get("ocr_model", "gundam")
+
     # Perform the conversion
     transform_epub(
         pdf_path=pdf_path,
         epub_path=epub_path,
         analysing_path=analysing_path if generate_plot else None,
+        model=ocr_model,
         models_cache_path=models_cache_path,
         includes_footnotes=includes_footnotes,
         generate_plot=generate_plot,

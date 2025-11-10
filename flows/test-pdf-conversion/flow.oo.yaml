@@ -35,3 +35,5 @@ nodes:
         value: "MathML"
       - handle: generate_plot
         value: false
+      - handle: ocr_model
+        value: gundam

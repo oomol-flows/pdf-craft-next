@@ -64,6 +64,20 @@ inputs_def:
     value: false
     nullable: true
 
+  - handle: ocr_model
+    description: "OCR model size (larger = better quality but slower, smaller =
+      faster but lower quality)"
+    json_schema:
+      type: string
+      enum:
+        - gundam
+        - large
+        - base
+        - small
+        - tiny
+    value: gundam
+    nullable: true
+
 outputs_def:
   - handle: epub_path
     description: "Path to the generated EPUB file"
