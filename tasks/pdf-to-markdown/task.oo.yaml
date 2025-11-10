@@ -1,0 +1,53 @@
+inputs_def:
+  - handle: pdf_path
+    description: "Path to the input PDF file"
+    json_schema:
+      type: string
+      ui:widget: file
+    nullable: false
+
+  - handle: output_dir
+    description: "Directory where the markdown file and assets will be saved"
+    json_schema:
+      type: string
+      ui:widget: dir
+    nullable: false
+
+  - handle: includes_footnotes
+    description: "Whether to include footnotes in the output markdown"
+    json_schema:
+      type: boolean
+    value: true
+    nullable: false
+
+  - group: Optional
+    collapsed: true
+
+  - handle: generate_plot
+    description: "Whether to generate analysis visualizations during conversion"
+    json_schema:
+      type: boolean
+    value: false
+    nullable: true
+
+outputs_def:
+  - handle: markdown_path
+    description: "Path to the generated markdown file"
+    json_schema:
+      type: string
+
+  - handle: assets_dir
+    description: "Directory containing the extracted images and assets"
+    json_schema:
+      type: string
+
+executor:
+  name: python
+  options:
+    entry: __init__.py
+    spawn: false
+
+title: "PDF to Markdown"
+icon: ":carbon:document-export:"
+description: "Convert PDF documents to Markdown format with image extraction.
+  Supports footnotes and generates analysis visualizations."

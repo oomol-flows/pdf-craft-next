@@ -1,0 +1,35 @@
+title: PDF Conversion Test Flow
+nodes:
+  - node_id: pdf-to-markdown#1
+    task: self::pdf-to-markdown
+    inputs_from:
+      - handle: pdf_path
+        value: /oomol-driver/oomol-storage/pdf/2024_The neurotransmitter calcitonin
+          gene-related peptide shapes an immunosuppressive microenvironment in
+          medullary thyroid cancer.pdf
+      - handle: output_dir
+        value: /oomol-driver/oomol-storage/epub
+      - handle: includes_footnotes
+        value: true
+      - handle: generate_plot
+        value: false
+
+  - node_id: pdf-to-epub#1
+    task: self::pdf-to-epub
+    inputs_from:
+      - handle: pdf_path
+        value: "/path/to/your/sample.pdf"
+      - handle: output_dir
+        value: "/oomol-driver/oomol-storage/epub-output"
+      - handle: book_title
+        value: "Sample Book"
+      - handle: book_authors
+        value: "Author Name"
+      - handle: includes_footnotes
+        value: true
+      - handle: table_render
+        value: "HTML"
+      - handle: latex_render
+        value: "MathML"
+      - handle: generate_plot
+        value: false

@@ -1,0 +1,8 @@
+version: 0.0.1
+scripts:
+  # Script executed when the container is first loaded
+  # eg: bootstrap: poetry add pandas
+  bootstrap: |
+    npm install
+    pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+    poetry install --no-root

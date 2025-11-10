@@ -1,0 +1,88 @@
+inputs_def:
+  - handle: pdf_path
+    description: "Path to the input PDF file"
+    json_schema:
+      type: string
+      ui:
+        widget: file
+        options:
+          filters:
+            - name: PDF Files
+              extensions:
+                - pdf
+    nullable: false
+
+  - handle: output_dir
+    description: "Directory where the EPUB file will be saved"
+    json_schema:
+      type: string
+      ui:
+        widget: dir
+    nullable: false
+
+  - handle: book_title
+    description: "Title of the book for EPUB metadata"
+    json_schema:
+      type: string
+    value: "Untitled Book"
+    nullable: false
+
+  - handle: book_authors
+    description: "Authors of the book (comma-separated for multiple authors)"
+    json_schema:
+      type: string
+    value: "Unknown Author"
+    nullable: false
+
+  - handle: includes_footnotes
+    description: "Whether to include footnotes in the output EPUB"
+    json_schema:
+      type: boolean
+    value: true
+    nullable: false
+
+  - group: Optional
+    collapsed: true
+
+  - handle: table_render
+    description: "How to render tables in the EPUB (HTML or Markdown)"
+    json_schema:
+      type: string
+      enum:
+        - HTML
+        - Markdown
+    value: "HTML"
+    nullable: true
+
+  - handle: latex_render
+    description: "How to render LaTeX formulas (MathML or LaTeX)"
+    json_schema:
+      type: string
+      enum:
+        - MathML
+        - LaTeX
+    value: "MathML"
+    nullable: true
+
+  - handle: generate_plot
+    description: "Whether to generate analysis visualizations during conversion"
+    json_schema:
+      type: boolean
+    value: false
+    nullable: true
+
+outputs_def:
+  - handle: epub_path
+    description: "Path to the generated EPUB file"
+    json_schema:
+      type: string
+
+executor:
+  name: python
+  options:
+    entry: __init__.py
+    spawn: false
+
+title: "PDF to EPUB"
+icon: ":carbon:document-pdf:"
+description: "Convert PDF documents to EPUB format with customizable rendering options. Supports footnotes, tables, LaTeX formulas, and metadata configuration."
