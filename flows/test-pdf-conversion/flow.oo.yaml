@@ -13,6 +13,10 @@ nodes:
         value: true
       - handle: generate_plot
         value: false
+      - handle: use_vllm
+        value: false
+      - handle: gpu_memory_utilization
+        value: 0.9
 
   - node_id: pdf-to-epub#1
     task: self::pdf-to-epub
