@@ -6,9 +6,11 @@ inputs_def:
       ui:widget: file
     nullable: false
 
+  - group: Optional
+    collapsed: true
+
   - handle: output_path
-    description: "Path where the markdown file will be saved (defaults to session
-      directory)"
+    description: Path where the markdown file will be saved (defaults to session directory)
     json_schema:
       type: string
       ui:widget: save
@@ -20,9 +22,6 @@ inputs_def:
         excludeAll: true
     value:
     nullable: true
-
-  - group: Optional
-    collapsed: true
 
   - handle: includes_footnotes
     description: "Whether to include footnotes in the output markdown (default: false)"
