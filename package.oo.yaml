@@ -14,3 +14,8 @@ scripts:
     pip install timm accelerate
     poetry install --no-root
     pip install --force-reinstall "numpy<2.0"
+name: pdf-craft-next
+platform:
+  - os: win32
+    cpu: x64
+    gpu: nvidia
