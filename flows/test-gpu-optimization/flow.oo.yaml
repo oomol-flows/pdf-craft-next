@@ -1,12 +1,12 @@
-title: PDF Conversion Test Flow
+title: Test GPU Optimization Levels
 nodes:
   - node_id: pdf-to-markdown#1
     task: self::pdf-to-markdown
     inputs_from:
       - handle: pdf_path
-        value: /oomol-driver/oomol-storage/pdf/2024_The neurotransmitter calcitonin
+        value: "/oomol-driver/oomol-storage/pdf/2024_The neurotransmitter calcitonin
           gene-related peptide shapes an immunosuppressive microenvironment in
-          medullary thyroid cancer.pdf
+          medullary thyroid cancer.pdf"
       - handle: output_dir
         value: /oomol-driver/oomol-storage/epub
       - handle: includes_footnotes
@@ -14,6 +14,6 @@ nodes:
       - handle: generate_plot
         value: false
       - handle: optimization_level
-        value: speed
+        value: "speed"
       - handle: gpu_memory_fraction
         value: 0.9

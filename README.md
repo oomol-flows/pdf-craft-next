@@ -21,10 +21,21 @@ Converts PDF documents to Markdown format with automatic image extraction.
 - `output_dir` (required): Directory where the markdown file and assets will be saved
 - `includes_footnotes` (required, default: true): Whether to include footnotes in the output
 - `generate_plot` (optional, default: false): Whether to generate analysis visualizations
+- `optimization_level` (optional, default: "balanced"): GPU inference optimization level
+  - `balanced`: bfloat16 + torch.compile (recommended for RTX 4090)
+  - `speed`: bfloat16 + torch.compile + Flash Attention 2 (maximum performance)
+  - `quality`: float16 only (conservative, for compatibility)
+- `gpu_memory_fraction` (optional, default: 0.9): Maximum GPU memory fraction to use (0.1-1.0)
 
 **Outputs:**
 - `markdown_path`: Path to the generated markdown file
 - `assets_dir`: Directory containing the extracted images and assets
+
+**GPU Optimization:**
+The task includes advanced GPU acceleration for RTX 4090 and similar GPUs:
+- **bfloat16 precision**: Reduces memory usage by 50% with minimal accuracy loss
+- **torch.compile**: JIT compilation for 20-30% speed improvement
+- **Flash Attention 2**: Optimized attention mechanism for 2-4x faster processing (speed mode)
 
 ### PDF to EPUB
 

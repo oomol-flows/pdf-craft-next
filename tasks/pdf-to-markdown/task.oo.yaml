@@ -30,6 +30,28 @@ inputs_def:
     value: false
     nullable: true
 
+  - handle: optimization_level
+    description: "Inference optimization level: 'balanced' (bfloat16, recommended),
+      'speed' (bfloat16 + flash-attn), 'quality' (float16, conservative)"
+    json_schema:
+      type: string
+      enum:
+        - balanced
+        - speed
+        - quality
+    value: balanced
+    nullable: true
+
+  - handle: gpu_memory_fraction
+    description: "Maximum GPU memory fraction to use (0.1-1.0). Lower values leave
+      memory for other tasks. Default: 0.9"
+    json_schema:
+      type: number
+      minimum: 0.1
+      maximum: 1.0
+    value: 0.9
+    nullable: true
+
 outputs_def:
   - handle: markdown_path
     description: "Path to the generated markdown file"

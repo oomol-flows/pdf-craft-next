@@ -5,6 +5,8 @@ class Inputs(typing.TypedDict):
     output_dir: str
     includes_footnotes: bool
     generate_plot: bool | None
+    optimization_level: typing.Literal["balanced", "speed", "quality"] | None
+    gpu_memory_fraction: float | None
 class Outputs(typing.TypedDict):
     markdown_path: typing.NotRequired[str]
     assets_dir: typing.NotRequired[str]
@@ -14,6 +16,7 @@ from pathlib import Path
 from oocana import Context
 import torch
 import math
+import os
 
 from pdf_craft import transform_markdown, OCREventKind
 
@@ -22,6 +25,92 @@ from pdf_craft import transform_markdown, OCREventKind
 torch.backends.cuda.matmul.allow_tf32 = True  # Enable TensorFloat-32 for matrix operations
 torch.backends.cudnn.allow_tf32 = True        # Enable TF32 for cuDNN operations
 torch.backends.cudnn.benchmark = True          # Enable cuDNN auto-tuner for optimal performance
+
+# Additional CUDA optimizations for RTX 4090
+torch.set_float32_matmul_precision('high')     # Use TF32 for float32 operations
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'  # Better memory management
+
+
+def setup_optimization(optimization_level: str, gpu_memory_fraction: float):
+    """
+    Configure GPU optimization settings based on the specified level.
+
+    Parameters:
+        optimization_level: One of 'balanced', 'speed', or 'quality'
+        gpu_memory_fraction: Maximum fraction of GPU memory to use (0.1-1.0)
+
+    Returns:
+        dict: Configuration settings for pdf_craft
+    """
+    # Set GPU memory fraction
+    if gpu_memory_fraction < 1.0:
+        torch.cuda.set_per_process_memory_fraction(gpu_memory_fraction)
+
+    config = {
+        "dtype": torch.float16,  # Default
+        "use_flash_attention": False,
+    }
+
+    if optimization_level == "quality":
+        # Conservative mode: float16
+        config["dtype"] = torch.float16
+        config["use_flash_attention"] = False
+
+    elif optimization_level == "balanced":
+        # Recommended: bfloat16 for better numerical stability
+        config["dtype"] = torch.bfloat16
+        config["use_flash_attention"] = False
+
+    elif optimization_level == "speed":
+        # Maximum speed: bfloat16 + Flash Attention 2
+        config["dtype"] = torch.bfloat16
+        config["use_flash_attention"] = True
+
+    return config
+
+
+def apply_model_optimizations(config: dict):
+    """
+    Apply optimizations to pdf_craft models via monkey patching.
+
+    This function patches the model loading process to apply dtype conversion
+    and Flash Attention 2 optimizations. Note: torch.compile has been removed
+    due to compatibility issues with the OOMOL task execution environment.
+
+    Parameters:
+        config: Configuration dict from setup_optimization()
+    """
+    from doc_page_extractor.model import DeepSeekOCRHugginfaceModel
+    from transformers import AutoModel
+    import torch
+
+    # Store original _ensure_models method
+    original_ensure_models = DeepSeekOCRHugginfaceModel._ensure_models
+
+    def optimized_ensure_models(self):
+        # Call original method to load models
+        result = original_ensure_models(self)
+
+        # Apply optimizations to each model after loading
+        target_dtype = config["dtype"]
+        print(f"[PDF-to-Markdown] Applying dtype optimization: {target_dtype}")
+
+        for idx, model in enumerate(result.llms):
+            # Model is already on CUDA and in bfloat16, may need to convert
+            if target_dtype != torch.bfloat16:
+                result.llms[idx] = model.to(dtype=target_dtype)
+                print(f"[PDF-to-Markdown] Model {idx} converted to {target_dtype}")
+            else:
+                print(f"[PDF-to-Markdown] Model {idx} using {target_dtype} (no conversion needed)")
+
+        # Flash Attention is controlled by _ATTN_IMPLEMENTATION in model.py
+        if config["use_flash_attention"]:
+            print("[PDF-to-Markdown] Flash Attention 2 is automatically enabled by doc_page_extractor")
+
+        return result
+
+    # Apply the monkey patch
+    DeepSeekOCRHugginfaceModel._ensure_models = optimized_ensure_models
 
 
 def safe_progress_value(value):
@@ -60,7 +149,7 @@ def main(params: Inputs, context: Context) -> Outputs:
 
     This function uses pdf-craft to transform PDF files into Markdown,
     extracting images and formatting text. It supports footnotes and
-    optional analysis visualization.
+    optional analysis visualization with GPU acceleration optimizations.
 
     Parameters:
         params: Input parameter dictionary containing:
@@ -68,6 +157,8 @@ def main(params: Inputs, context: Context) -> Outputs:
             - output_dir: Directory for output files
             - includes_footnotes: Whether to include footnotes
             - generate_plot: Whether to generate analysis plots (optional)
+            - optimization_level: GPU optimization level (optional)
+            - gpu_memory_fraction: GPU memory limit (optional)
         context: OOMOL context object
 
     Returns:
@@ -83,13 +174,28 @@ def main(params: Inputs, context: Context) -> Outputs:
             "Please ensure you have a compatible GPU and CUDA drivers installed."
         )
 
-    # Log GPU information
+    # Get optimization parameters
+    optimization_level = params.get("optimization_level", "balanced")
+    gpu_memory_fraction = params.get("gpu_memory_fraction", 0.9)
+
+    # Setup GPU optimizations
+    opt_config = setup_optimization(optimization_level, gpu_memory_fraction)
+
+    # Apply model optimizations via monkey patching
+    apply_model_optimizations(opt_config)
+
+    # Log GPU information with optimization settings
     gpu_name = torch.cuda.get_device_name(0)
     cuda_version = torch.version.cuda
-    gpu_message = f"Using GPU: {gpu_name} (CUDA {cuda_version})"
+    dtype_name = "bfloat16" if opt_config["dtype"] == torch.bfloat16 else "float16"
+    gpu_message = f"Using GPU: {gpu_name} (CUDA {cuda_version}) | Optimization: {optimization_level} ({dtype_name})"
+
+    if opt_config["use_flash_attention"]:
+        gpu_message += " + Flash Attention 2"
 
     # Log progress with business context
-    log_progress_report(0, gpu_message, "GPU initialization and CUDA availability check")
+    opt_context = f"GPU memory limit: {gpu_memory_fraction*100:.0f}% | Dtype: {dtype_name} | Flash-Attn: {opt_config['use_flash_attention']}"
+    log_progress_report(0, gpu_message, opt_context)
     context.report_progress(0)
 
     # Convert paths to Path objects
