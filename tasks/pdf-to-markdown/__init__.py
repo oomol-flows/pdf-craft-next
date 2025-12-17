@@ -5,7 +5,7 @@ class Inputs(typing.TypedDict):
     output_dir: str
     includes_footnotes: bool
     generate_plot: bool | None
-    optimization_level: typing.Literal["balanced", "speed", "quality"] | None
+    optimization_level: typing.Literal["balanced", "quality"] | None
     gpu_memory_fraction: float | None
 class Outputs(typing.TypedDict):
     markdown_path: typing.NotRequired[str]
@@ -36,7 +36,7 @@ def setup_optimization(optimization_level: str, gpu_memory_fraction: float):
     Configure GPU optimization settings based on the specified level.
 
     Parameters:
-        optimization_level: One of 'balanced', 'speed', or 'quality'
+        optimization_level: One of 'balanced' or 'quality'
         gpu_memory_fraction: Maximum fraction of GPU memory to use (0.1-1.0)
 
     Returns:
@@ -48,23 +48,15 @@ def setup_optimization(optimization_level: str, gpu_memory_fraction: float):
 
     config = {
         "dtype": torch.float16,  # Default
-        "use_flash_attention": False,
     }
 
     if optimization_level == "quality":
         # Conservative mode: float16
         config["dtype"] = torch.float16
-        config["use_flash_attention"] = False
 
     elif optimization_level == "balanced":
         # Recommended: bfloat16 for better numerical stability
         config["dtype"] = torch.bfloat16
-        config["use_flash_attention"] = False
-
-    elif optimization_level == "speed":
-        # Maximum speed: bfloat16 + Flash Attention 2
-        config["dtype"] = torch.bfloat16
-        config["use_flash_attention"] = True
 
     return config
 
@@ -73,9 +65,7 @@ def apply_model_optimizations(config: dict):
     """
     Apply optimizations to pdf_craft models via monkey patching.
 
-    This function patches the model loading process to apply dtype conversion
-    and Flash Attention 2 optimizations. Note: torch.compile has been removed
-    due to compatibility issues with the OOMOL task execution environment.
+    This function patches the model loading process to apply dtype conversion.
 
     Parameters:
         config: Configuration dict from setup_optimization()
@@ -102,10 +92,6 @@ def apply_model_optimizations(config: dict):
                 print(f"[PDF-to-Markdown] Model {idx} converted to {target_dtype}")
             else:
                 print(f"[PDF-to-Markdown] Model {idx} using {target_dtype} (no conversion needed)")
-
-        # Flash Attention is controlled by _ATTN_IMPLEMENTATION in model.py
-        if config["use_flash_attention"]:
-            print("[PDF-to-Markdown] Flash Attention 2 is automatically enabled by doc_page_extractor")
 
         return result
 
@@ -190,11 +176,8 @@ def main(params: Inputs, context: Context) -> Outputs:
     dtype_name = "bfloat16" if opt_config["dtype"] == torch.bfloat16 else "float16"
     gpu_message = f"Using GPU: {gpu_name} (CUDA {cuda_version}) | Optimization: {optimization_level} ({dtype_name})"
 
-    if opt_config["use_flash_attention"]:
-        gpu_message += " + Flash Attention 2"
-
     # Log progress with business context
-    opt_context = f"GPU memory limit: {gpu_memory_fraction*100:.0f}% | Dtype: {dtype_name} | Flash-Attn: {opt_config['use_flash_attention']}"
+    opt_context = f"GPU memory limit: {gpu_memory_fraction*100:.0f}% | Dtype: {dtype_name} | TF32: Enabled"
     log_progress_report(0, gpu_message, opt_context)
     context.report_progress(0)
 

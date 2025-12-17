@@ -32,12 +32,11 @@ inputs_def:
 
   - handle: optimization_level
     description: "Inference optimization level: 'balanced' (bfloat16, recommended),
-      'speed' (bfloat16 + flash-attn), 'quality' (float16, conservative)"
+      'quality' (float16, conservative)"
     json_schema:
       type: string
       enum:
         - balanced
-        - speed
         - quality
     value: balanced
     nullable: true
