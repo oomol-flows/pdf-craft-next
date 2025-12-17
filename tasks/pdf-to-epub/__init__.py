@@ -6,10 +6,10 @@ class Inputs(typing.TypedDict):
     book_title: str
     book_authors: str
     includes_footnotes: bool
+    ocr_model: typing.Literal["gundam", "large", "base", "small", "tiny"] | None
     table_render: typing.Literal["HTML", "Markdown"] | None
     latex_render: typing.Literal["MathML", "LaTeX"] | None
     generate_plot: bool | None
-    ocr_model: typing.Literal["gundam", "large", "base", "small", "tiny"] | None
 class Outputs(typing.TypedDict):
     epub_path: typing.NotRequired[str]
 #endregion
@@ -124,7 +124,6 @@ def main(params: Inputs, context: Context) -> Outputs:
 
         # Calculate progress percentage - safe_progress_value handles NaN/None
         progress_percent = safe_progress_value((current_page / total_pages * 100) if total_pages > 0 else 0)
-        context.report_progress(0)
         if kind == OCREventKind.START:
             if current_page == 1:
                 context.report_progress(0)
@@ -151,7 +150,7 @@ def main(params: Inputs, context: Context) -> Outputs:
         pdf_path=pdf_path,
         epub_path=epub_path,
         analysing_path=analysing_path if generate_plot else None,
-        model=ocr_model,
+        ocr_size=ocr_model,
         models_cache_path=models_cache_path,
         includes_footnotes=includes_footnotes,
         generate_plot=generate_plot,

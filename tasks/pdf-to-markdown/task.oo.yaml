@@ -20,6 +20,20 @@ inputs_def:
     value: false
     nullable: false
 
+  - handle: ocr_size
+    description: "OCR model size: 'gundam' (balanced, default), 'small' (faster),
+      'tiny' (fastest), 'base' (standard), 'large' (highest quality)"
+    json_schema:
+      type: string
+      enum:
+        - gundam
+        - small
+        - tiny
+        - base
+        - large
+    value: base
+    nullable: false
+
   - group: Optional
     collapsed: true
 

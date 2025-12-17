@@ -34,8 +34,22 @@ inputs_def:
     value: false
     nullable: false
 
+  - handle: ocr_model
+    description: OCR model size (larger = better quality but slower, smaller =
+      faster but lower quality)
+    json_schema:
+      type: string
+      enum:
+        - gundam
+        - large
+        - base
+        - small
+        - tiny
+    value: base
+    nullable: true
+
   - group: Optional
-    collapsed: true
+    collapsed: false
 
   - handle: table_render
     description: "How to render tables in the EPUB (HTML or Markdown)"
@@ -62,20 +76,6 @@ inputs_def:
     json_schema:
       type: boolean
     value: false
-    nullable: true
-
-  - handle: ocr_model
-    description: "OCR model size (larger = better quality but slower, smaller =
-      faster but lower quality)"
-    json_schema:
-      type: string
-      enum:
-        - gundam
-        - large
-        - base
-        - small
-        - tiny
-    value: gundam
     nullable: true
 
 outputs_def:

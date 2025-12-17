@@ -4,6 +4,7 @@ class Inputs(typing.TypedDict):
     pdf_path: str
     output_dir: str
     includes_footnotes: bool
+    ocr_size: typing.Literal["gundam", "small", "tiny", "base", "large"]
     generate_plot: bool | None
     optimization_level: typing.Literal["balanced", "quality"] | None
     gpu_memory_fraction: float | None

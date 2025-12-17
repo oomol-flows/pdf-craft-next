@@ -14,6 +14,8 @@ nodes:
       - handle: generate_plot
         value: false
       - handle: optimization_level
-        value: "speed"
+        value:
       - handle: gpu_memory_fraction
         value: 0.9
+      - handle: ocr_size
+        value: base
