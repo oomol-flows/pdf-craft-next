@@ -10,7 +10,7 @@ nodes:
       - handle: output_dir
         value: /oomol-driver/oomol-storage/epub
       - handle: includes_footnotes
-        value: true
+        value: false
       - handle: generate_plot
         value: false
       - handle: optimization_level

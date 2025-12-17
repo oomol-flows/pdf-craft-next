@@ -31,7 +31,7 @@ inputs_def:
     description: "Whether to include footnotes in the output EPUB"
     json_schema:
       type: boolean
-    value: true
+    value: false
     nullable: false
 
   - group: Optional
