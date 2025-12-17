@@ -6,35 +6,33 @@ inputs_def:
       ui:widget: file
     nullable: false
 
-  - handle: output_dir
-    description: "Directory where the EPUB file will be saved"
+  - handle: output_path
+    description: "Path where the EPUB file will be saved (defaults to session directory)"
     json_schema:
       type: string
-      ui:widget: dir
-    nullable: false
+      ui:widget: save
+      ui:options:
+        filters:
+          - name: EPUB
+            extensions:
+              - epub
+        excludeAll: true
+    value:
+    nullable: true
 
-  - handle: book_title
-    description: "Title of the book for EPUB metadata"
-    json_schema:
-      type: string
-    nullable: false
-
-  - handle: book_authors
-    description: "Authors of the book (comma-separated for multiple authors)"
-    json_schema:
-      type: string
-    nullable: false
+  - group: Optional
+    collapsed: true
 
   - handle: includes_footnotes
-    description: "Whether to include footnotes in the output EPUB"
+    description: "Whether to include footnotes in the output EPUB (default: false)"
     json_schema:
       type: boolean
-    value: false
-    nullable: false
+    value:
+    nullable: true
 
   - handle: ocr_model
-    description: OCR model size (larger = better quality but slower, smaller =
-      faster but lower quality)
+    description: "OCR model size (larger = better quality but slower, smaller =
+      faster but lower quality, default: base)"
     json_schema:
       type: string
       enum:
@@ -43,37 +41,49 @@ inputs_def:
         - base
         - small
         - tiny
-    value: base
+    value:
     nullable: true
 
-  - group: Optional
-    collapsed: true
+  - handle: book_title
+    description: "Title of the book for EPUB metadata"
+    json_schema:
+      type: string
+    value:
+    nullable: true
+
+  - handle: book_authors
+    description: "Authors of the book (comma-separated for multiple authors)"
+    json_schema:
+      type: string
+    value:
+    nullable: true
 
   - handle: table_render
-    description: "How to render tables in the EPUB (HTML or Markdown)"
+    description: "How to render tables in the EPUB (default: HTML)"
     json_schema:
       type: string
       enum:
         - HTML
         - Markdown
-    value: HTML
+    value:
     nullable: true
 
   - handle: latex_render
-    description: "How to render LaTeX formulas (MathML or LaTeX)"
+    description: "How to render LaTeX formulas (default: MathML)"
     json_schema:
       type: string
       enum:
         - MathML
         - LaTeX
-    value: MathML
+    value:
     nullable: true
 
   - handle: generate_plot
-    description: "Whether to generate analysis visualizations during conversion"
+    description: "Whether to generate analysis visualizations during conversion
+      (default: false)"
     json_schema:
       type: boolean
-    value: false
+    value:
     nullable: true
 
 outputs_def:

@@ -6,23 +6,34 @@ inputs_def:
       ui:widget: file
     nullable: false
 
-  - handle: output_dir
-    description: "Directory where the markdown file and assets will be saved"
+  - handle: output_path
+    description: "Path where the markdown file will be saved (defaults to session
+      directory)"
     json_schema:
       type: string
-      ui:widget: dir
-    nullable: false
+      ui:widget: save
+      ui:options:
+        filters:
+          - name: Markdown
+            extensions:
+              - md
+        excludeAll: true
+    value:
+    nullable: true
+
+  - group: Optional
+    collapsed: true
 
   - handle: includes_footnotes
-    description: "Whether to include footnotes in the output markdown"
+    description: "Whether to include footnotes in the output markdown (default: false)"
     json_schema:
       type: boolean
-    value: false
-    nullable: false
+    value:
+    nullable: true
 
   - handle: ocr_size
-    description: "OCR model size: 'gundam' (balanced, default), 'small' (faster),
-      'tiny' (fastest), 'base' (standard), 'large' (highest quality)"
+    description: "OCR model size: 'gundam' (balanced), 'small' (faster), 'tiny'
+      (fastest), 'base' (standard, default), 'large' (highest quality)"
     json_schema:
       type: string
       enum:
@@ -31,38 +42,36 @@ inputs_def:
         - tiny
         - base
         - large
-    value: base
-    nullable: false
-
-  - group: Optional
-    collapsed: true
+    value:
+    nullable: true
 
   - handle: generate_plot
-    description: "Whether to generate analysis visualizations during conversion"
+    description: "Whether to generate analysis visualizations during conversion
+      (default: false)"
     json_schema:
       type: boolean
-    value: false
+    value:
     nullable: true
 
   - handle: optimization_level
-    description: "Inference optimization level: 'balanced' (bfloat16, recommended),
-      'quality' (float16, conservative)"
+    description: "Inference optimization level: 'balanced' (bfloat16, recommended,
+      default), 'quality' (float16, conservative)"
     json_schema:
       type: string
       enum:
         - balanced
         - quality
-    value: balanced
+    value:
     nullable: true
 
   - handle: gpu_memory_fraction
     description: "Maximum GPU memory fraction to use (0.1-1.0). Lower values leave
-      memory for other tasks. Default: 0.9"
+      memory for other tasks (default: 0.9)"
     json_schema:
       type: number
       minimum: 0.1
       maximum: 1.0
-    value: 0.9
+    value:
     nullable: true
 
 outputs_def:

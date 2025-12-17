@@ -2,11 +2,11 @@
 import typing
 class Inputs(typing.TypedDict):
     pdf_path: str
-    output_dir: str
-    book_title: str
-    book_authors: str
-    includes_footnotes: bool
+    output_path: str | None
+    includes_footnotes: bool | None
     ocr_model: typing.Literal["gundam", "large", "base", "small", "tiny"] | None
+    book_title: str | None
+    book_authors: str | None
     table_render: typing.Literal["HTML", "Markdown"] | None
     latex_render: typing.Literal["MathML", "LaTeX"] | None
     generate_plot: bool | None
@@ -77,16 +77,25 @@ def main(params: Inputs, context: Context) -> Outputs:
 
     # Convert paths to Path objects
     pdf_path = Path(params["pdf_path"])
-    output_dir = Path(params["output_dir"])
+
+    # Get output path, default to session directory if not provided
+    output_path_param = params.get("output_path")
+    if output_path_param:
+        epub_path = Path(output_path_param)
+        # Ensure the output path has .epub extension
+        if not epub_path.suffix.lower() == ".epub":
+            epub_path = epub_path.with_suffix(".epub")
+    else:
+        # Default to session directory with PDF filename
+        session_dir = Path(context.session_dir)
+        pdf_filename = pdf_path.stem
+        epub_path = session_dir / f"{pdf_filename}.epub"
 
     # Create output directory if it doesn't exist
+    output_dir = epub_path.parent
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Get PDF filename without extension for EPUB output
-    pdf_filename = pdf_path.stem
-    epub_path = output_dir / f"{pdf_filename}.epub"
-
-    # Set up analysis path
+    # Set up analysis path (same directory as output)
     analysing_path = output_dir / "analysis"
 
     # Create models cache directory in oomol-storage
@@ -105,16 +114,28 @@ def main(params: Inputs, context: Context) -> Outputs:
     latex_render_str = params.get("latex_render", "MathML")
     latex_render = LaTeXRender.MATHML if latex_render_str == "MathML" else LaTeXRender.LATEX
 
-    # Configure book metadata
-    book_title = params.get("book_title", "Untitled Book")
-    book_authors_str = params.get("book_authors", "Unknown Author")
-    # Split authors by comma and strip whitespace
-    book_authors = [author.strip() for author in book_authors_str.split(",")]
+    # Configure book metadata (optional)
+    book_title = params.get("book_title")
+    book_authors_str = params.get("book_authors")
 
-    book_meta = BookMeta(
-        title=book_title,
-        authors=book_authors
-    )
+    # Only set book metadata if title or authors are provided
+    book_meta = None
+    if book_title or book_authors_str:
+        # Use defaults if only one is provided
+        if not book_title:
+            book_title = "Untitled Book"
+        if not book_authors_str:
+            book_authors = ["Unknown Author"]
+        else:
+            # Split authors by comma and strip whitespace
+            book_authors = [author.strip() for author in book_authors_str.split(",") if author.strip()]
+            if not book_authors:
+                book_authors = ["Unknown Author"]
+
+        book_meta = BookMeta(
+            title=book_title,
+            authors=book_authors
+        )
 
     # Progress tracking callback
     def on_ocr_event(event):

@@ -2,9 +2,9 @@
 import typing
 class Inputs(typing.TypedDict):
     pdf_path: str
-    output_dir: str
-    includes_footnotes: bool
-    ocr_size: typing.Literal["gundam", "small", "tiny", "base", "large"]
+    output_path: str | None
+    includes_footnotes: bool | None
+    ocr_size: typing.Literal["gundam", "small", "tiny", "base", "large"] | None
     generate_plot: bool | None
     optimization_level: typing.Literal["balanced", "quality"] | None
     gpu_memory_fraction: float | None
@@ -184,13 +184,25 @@ def main(params: Inputs, context: Context) -> Outputs:
 
     # Convert paths to Path objects
     pdf_path = Path(params["pdf_path"])
-    output_dir = Path(params["output_dir"])
+
+    # Get output path, default to session directory if not provided
+    output_path_param = params.get("output_path")
+    if output_path_param:
+        markdown_path = Path(output_path_param)
+        # Ensure the output path has .md extension
+        if not markdown_path.suffix.lower() == ".md":
+            markdown_path = markdown_path.with_suffix(".md")
+    else:
+        # Default to session directory with PDF filename
+        session_dir = Path(context.session_dir)
+        pdf_filename = pdf_path.stem
+        markdown_path = session_dir / f"{pdf_filename}.md"
 
     # Create output directory if it doesn't exist
+    output_dir = markdown_path.parent
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Set up output paths
-    markdown_path = output_dir / "output.md"
+    # Set up output paths (assets and analysis in same directory as markdown)
     assets_dir = output_dir / "images"
     analysing_path = output_dir / "analysis"
 
@@ -198,13 +210,14 @@ def main(params: Inputs, context: Context) -> Outputs:
     models_cache_path = Path("/oomol-driver/oomol-storage/pdf-craft-models-cache")
     models_cache_path.mkdir(parents=True, exist_ok=True)
 
-    # Get optional parameters
-    includes_footnotes = params.get("includes_footnotes", True)
+    # Get optional parameters with defaults
+    includes_footnotes = params.get("includes_footnotes", False)  # Default: false
+    ocr_size = params.get("ocr_size", "base")  # Default: base
     generate_plot = params.get("generate_plot", False)
 
     # Log conversion start with business context
     start_message = f"Initializing PDF-to-Markdown conversion"
-    start_context = f"PDF: {pdf_path.name} | Output: {output_dir} | Footnotes: {includes_footnotes} | Plots: {generate_plot}"
+    start_context = f"PDF: {pdf_path.name} | Output: {markdown_path} | Footnotes: {includes_footnotes} | Plots: {generate_plot}"
     log_progress_report(0, start_message, start_context)
     print(f"[PDF-to-Markdown] {start_message}")
 
@@ -268,6 +281,7 @@ def main(params: Inputs, context: Context) -> Outputs:
         markdown_path=markdown_path,
         markdown_assets_path=Path("images"),
         analysing_path=analysing_path if generate_plot else None,
+        ocr_size=ocr_size,
         models_cache_path=models_cache_path,
         includes_footnotes=includes_footnotes,
         generate_plot=generate_plot,

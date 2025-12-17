@@ -4,11 +4,6 @@ nodes:
     task: self::pdf-to-markdown
     inputs_from:
       - handle: pdf_path
-        value: "/oomol-driver/oomol-storage/pdf/2024_The neurotransmitter calcitonin
-          gene-related peptide shapes an immunosuppressive microenvironment in
-          medullary thyroid cancer.pdf"
-      - handle: output_dir
-        value: /oomol-driver/oomol-storage/epub
       - handle: includes_footnotes
         value: true
       - handle: generate_plot
@@ -19,3 +14,5 @@ nodes:
         value: 0.9
       - handle: ocr_size
         value: base
+      - handle: output_path
+        value:
