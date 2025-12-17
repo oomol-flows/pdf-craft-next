@@ -4,8 +4,13 @@ scripts:
   # eg: bootstrap: poetry add pandas
   bootstrap: |
     npm install
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+    apt-get update && apt-get install -y poppler-utils
+
+    # Install specific compatible versions of PyTorch, torchvision, and torchaudio
+    # These versions are compatible with vllm 0.11.2 and doc-page-extractor requirements
+    echo "Installing PyTorch 2.9.0 with compatible versions"
+    pip install torch==2.9.0 torchvision==0.24.0 torchaudio==2.9.0
+
     pip install timm accelerate
-    pip install vllm
     poetry install --no-root
     pip install --force-reinstall "numpy<2.0"

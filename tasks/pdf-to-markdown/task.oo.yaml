@@ -23,24 +23,6 @@ inputs_def:
   - group: Optional
     collapsed: true
 
-  - handle: use_vllm
-    description: "Enable vLLM backend for high-performance inference (recommended
-      for faster processing)"
-    json_schema:
-      type: boolean
-    value: true
-    nullable: false
-
-  - handle: gpu_memory_utilization
-    description: "GPU memory utilization ratio for vLLM (0.0-1.0). Only used when
-      vLLM is enabled"
-    json_schema:
-      type: number
-      minimum: 0.1
-      maximum: 1.0
-    value: 0.9
-    nullable: true
-
   - handle: generate_plot
     description: "Whether to generate analysis visualizations during conversion"
     json_schema:

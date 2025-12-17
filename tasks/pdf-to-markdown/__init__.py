@@ -4,22 +4,16 @@ class Inputs(typing.TypedDict):
     pdf_path: str
     output_dir: str
     includes_footnotes: bool
-    use_vllm: bool
-    gpu_memory_utilization: float | None
     generate_plot: bool | None
 class Outputs(typing.TypedDict):
     markdown_path: typing.NotRequired[str]
     assets_dir: typing.NotRequired[str]
 #endregion
 
-import sys
 from pathlib import Path
 from oocana import Context
 import torch
 import math
-
-# Add local libs to path to use modified versions with vLLM support
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "libs"))
 
 from pdf_craft import transform_markdown, OCREventKind
 
@@ -117,20 +111,12 @@ def main(params: Inputs, context: Context) -> Outputs:
     # Get optional parameters
     includes_footnotes = params.get("includes_footnotes", True)
     generate_plot = params.get("generate_plot", False)
-    use_vllm = params.get("use_vllm", True)
-    gpu_memory_utilization = params.get("gpu_memory_utilization", 0.9)
-
-    # Determine backend
-    backend = "vllm" if use_vllm else "transformers"
 
     # Log conversion start with business context
     start_message = f"Initializing PDF-to-Markdown conversion"
-    start_context = f"PDF: {pdf_path.name} | Output: {output_dir} | Backend: {backend} | Footnotes: {includes_footnotes} | Plots: {generate_plot}"
-    if use_vllm:
-        start_context += f" | GPU Memory: {gpu_memory_utilization*100:.0f}%"
+    start_context = f"PDF: {pdf_path.name} | Output: {output_dir} | Footnotes: {includes_footnotes} | Plots: {generate_plot}"
     log_progress_report(0, start_message, start_context)
     print(f"[PDF-to-Markdown] {start_message}")
-    print(f"[PDF-to-Markdown] Backend: {backend.upper()}")
 
     # Progress tracking callback
     def on_ocr_event(event):
@@ -187,12 +173,7 @@ def main(params: Inputs, context: Context) -> Outputs:
                 log_progress_report(100, complete_message, complete_context)
                 print(f"[PDF-to-Markdown] {complete_message}")
 
-    # Perform the conversion with selected backend
-    if use_vllm:
-        print(f"[PDF-to-Markdown] Using vLLM backend for high-performance inference (GPU: {gpu_memory_utilization*100:.0f}%)")
-    else:
-        print(f"[PDF-to-Markdown] Using transformers backend")
-
+    # Perform the conversion
     transform_markdown(
         pdf_path=pdf_path,
         markdown_path=markdown_path,
@@ -202,9 +183,6 @@ def main(params: Inputs, context: Context) -> Outputs:
         includes_footnotes=includes_footnotes,
         generate_plot=generate_plot,
         on_ocr_event=on_ocr_event,
-        backend=backend,
-        gpu_memory_utilization=gpu_memory_utilization,
-        max_model_len=4096,
     )
 
     return {

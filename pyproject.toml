@@ -8,7 +8,7 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.10,<3.13"
 dependencies = [
-    "pdf-craft @ git+https://github.com/oomol-lab/pdf-craft.git@next"
+    "pdf-craft (>=1.0.0)"
 ]
 
 [tool.poetry]
