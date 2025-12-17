@@ -1,6 +1,6 @@
 inputs_def:
   - handle: pdf_path
-    description: "Path to the input PDF file"
+    description: "%path-to-the-input-pdf-file-to-be-converted-the-file-must-be-a-va%"
     json_schema:
       type: string
       ui:widget: file
@@ -10,7 +10,7 @@ inputs_def:
     collapsed: true
 
   - handle: output_path
-    description: Path where the EPUB file will be saved (defaults to session directory)
+    description: "%destination-path-where-the-converted-epub-file-will-be-saved-if%"
     json_schema:
       type: string
       ui:widget: save
@@ -24,15 +24,14 @@ inputs_def:
     nullable: true
 
   - handle: includes_footnotes
-    description: "Whether to include footnotes in the output EPUB (default: false)"
+    description: "%controls-whether-footnotes-in-the-pdf-document-should-be-preserv%"
     json_schema:
       type: boolean
     value:
     nullable: true
 
   - handle: ocr_model
-    description: "OCR model size (larger = better quality but slower, smaller =
-      faster but lower quality, default: base)"
+    description: "%specifies-the-ocr-optical-character-recognition-model-size-to-us%"
     json_schema:
       type: string
       enum:
@@ -45,21 +44,21 @@ inputs_def:
     nullable: true
 
   - handle: book_title
-    description: "Title of the book for EPUB metadata"
+    description: "%sets-the-title-metadata-for-the-generated-epub-file-this-title-w%"
     json_schema:
       type: string
     value:
     nullable: true
 
   - handle: book_authors
-    description: "Authors of the book (comma-separated for multiple authors)"
+    description: "%specifies-the-author-s-metadata-for-the-generated-epub-file-for%"
     json_schema:
       type: string
     value:
     nullable: true
 
   - handle: table_render
-    description: "How to render tables in the EPUB (default: HTML)"
+    description: "%determines-how-tables-in-the-pdf-should-be-rendered-in-the-epub%"
     json_schema:
       type: string
       enum:
@@ -69,7 +68,7 @@ inputs_def:
     nullable: true
 
   - handle: latex_render
-    description: "How to render LaTeX formulas (default: MathML)"
+    description: "%controls-how-latex-mathematical-formulas-and-equations-should-be%"
     json_schema:
       type: string
       enum:
@@ -79,8 +78,7 @@ inputs_def:
     nullable: true
 
   - handle: generate_plot
-    description: "Whether to generate analysis visualizations during conversion
-      (default: false)"
+    description: "%enables-or-disables-the-generation-of-analysis-visualizations-du%"
     json_schema:
       type: boolean
     value:
@@ -88,7 +86,7 @@ inputs_def:
 
 outputs_def:
   - handle: epub_path
-    description: "Path to the generated EPUB file"
+    description: "%absolute-file-path-to-the-successfully-generated-epub-file-this%"
     json_schema:
       type: string
 
@@ -98,8 +96,6 @@ executor:
     entry: __init__.py
     spawn: false
 
-title: "PDF to EPUB"
+title: "%pdf-to-epub%"
 icon: ":carbon:document-pdf:"
-description: "Convert PDF documents to EPUB format with customizable rendering
-  options. Supports footnotes, tables, LaTeX formulas, and metadata
-  configuration."
+description: "%convert-pdf-documents-to-epub-electronic-publication-format-usin%"

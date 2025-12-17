@@ -1,4 +1,4 @@
-version: 0.0.1
+version: 1.0.0
 scripts:
   # Script executed when the container is first loaded
   # eg: bootstrap: poetry add pandas
@@ -14,8 +14,12 @@ scripts:
     pip install timm accelerate
     poetry install --no-root
     pip install --force-reinstall "numpy<2.0"
-name: pdf-craft-next
+name: pdf-craft
 platform:
   - os: win32
     cpu: x64
     gpu: nvidia
+repository: https://github.com/oomol-flows/pdf-craft-next
+icon: ./icon.png
+displayName: "%display-name%"
+description: "%description%"

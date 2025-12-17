@@ -1,6 +1,6 @@
 inputs_def:
   - handle: pdf_path
-    description: "Path to the input PDF file"
+    description: "%path-to-the-input-pdf-file-to-be-converted-to-markdown-the-file%"
     json_schema:
       type: string
       ui:widget: file
@@ -10,7 +10,7 @@ inputs_def:
     collapsed: true
 
   - handle: output_path
-    description: Path where the markdown file will be saved (defaults to session directory)
+    description: "%destination-path-where-the-converted-markdown-file-will-be-saved%"
     json_schema:
       type: string
       ui:widget: save
@@ -24,15 +24,14 @@ inputs_def:
     nullable: true
 
   - handle: includes_footnotes
-    description: "Whether to include footnotes in the output markdown (default: false)"
+    description: "%controls-whether-footnotes-in-the-pdf-document-should-be-preserv2%"
     json_schema:
       type: boolean
     value:
     nullable: true
 
   - handle: ocr_size
-    description: "OCR model size: 'gundam' (balanced), 'small' (faster), 'tiny'
-      (fastest), 'base' (standard, default), 'large' (highest quality)"
+    description: "%specifies-the-ocr-optical-character-recognition-model-size-for-t%"
     json_schema:
       type: string
       enum:
@@ -45,16 +44,14 @@ inputs_def:
     nullable: true
 
   - handle: generate_plot
-    description: "Whether to generate analysis visualizations during conversion
-      (default: false)"
+    description: "%enables-or-disables-the-generation-of-analysis-visualizations-an%"
     json_schema:
       type: boolean
     value:
     nullable: true
 
   - handle: optimization_level
-    description: "Inference optimization level: 'balanced' (bfloat16, recommended,
-      default), 'quality' (float16, conservative)"
+    description: "%controls-the-gpu-inference-optimization-strategy-for-ocr-process%"
     json_schema:
       type: string
       enum:
@@ -64,8 +61,7 @@ inputs_def:
     nullable: true
 
   - handle: gpu_memory_fraction
-    description: "Maximum GPU memory fraction to use (0.1-1.0). Lower values leave
-      memory for other tasks (default: 0.9)"
+    description: "%specifies-the-maximum-fraction-of-gpu-memory-that-can-be-utilize%"
     json_schema:
       type: number
       minimum: 0.1
@@ -75,7 +71,7 @@ inputs_def:
 
 outputs_def:
   - handle: zip_path
-    description: "Path to the zip archive containing markdown and all assets"
+    description: "%absolute-file-path-to-a-zip-archive-containing-the-complete-conv%"
     json_schema:
       type: string
 
@@ -85,7 +81,6 @@ executor:
     entry: __init__.py
     spawn: false
 
-title: "PDF to Markdown"
+title: "%pdf-to-markdown%"
 icon: ":carbon:document-export:"
-description: "Convert PDF documents to Markdown format with image extraction.
-  Supports footnotes and generates analysis visualizations."
+description: "%convert-pdf-documents-to-markdown-format-with-comprehensive-imag%"

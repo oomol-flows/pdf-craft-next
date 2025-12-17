@@ -1,4 +1,5 @@
-title: Test GPU Optimization Levels
+title: "%test-gpu-optimization-levels%"
+description: "%testing-workflow-for-evaluating-different-gpu-optimization-confi%"
 nodes:
   - node_id: pdf-to-markdown#1
     task: self::pdf-to-markdown
