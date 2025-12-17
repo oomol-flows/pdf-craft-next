@@ -126,7 +126,6 @@ def main(params: Inputs, context: Context) -> Outputs:
 
         # Calculate progress percentage - safe_progress_value handles NaN/None
         progress_percent = safe_progress_value((current_page / total_pages * 100) if total_pages > 0 else 0)
-        context.report_progress(0)
         if kind == OCREventKind.START:
             if current_page == 1:
                 message = f"Starting conversion of {total_pages} pages"
