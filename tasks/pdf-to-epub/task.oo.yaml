@@ -17,14 +17,12 @@ inputs_def:
     description: "Title of the book for EPUB metadata"
     json_schema:
       type: string
-    value: Untitled Book
     nullable: false
 
   - handle: book_authors
     description: "Authors of the book (comma-separated for multiple authors)"
     json_schema:
       type: string
-    value: Unknown Author
     nullable: false
 
   - handle: includes_footnotes
@@ -49,7 +47,7 @@ inputs_def:
     nullable: true
 
   - group: Optional
-    collapsed: false
+    collapsed: true
 
   - handle: table_render
     description: "How to render tables in the EPUB (HTML or Markdown)"
