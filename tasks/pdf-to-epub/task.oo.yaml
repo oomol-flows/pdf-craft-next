@@ -7,7 +7,7 @@ inputs_def:
     nullable: false
 
   - group: Optional
-    collapsed: false
+    collapsed: true
 
   - handle: output_path
     description: Path where the EPUB file will be saved (defaults to session directory)

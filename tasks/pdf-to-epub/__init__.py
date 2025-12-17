@@ -102,8 +102,8 @@ def main(params: Inputs, context: Context) -> Outputs:
     models_cache_path = Path("/oomol-driver/oomol-storage/pdf-craft-models-cache")
     models_cache_path.mkdir(parents=True, exist_ok=True)
 
-    # Get optional parameters
-    includes_footnotes = params.get("includes_footnotes", True)
+    # Get optional parameters with defaults
+    includes_footnotes = params.get("includes_footnotes", False)  # Default: false
     generate_plot = params.get("generate_plot", False)
 
     # Configure table rendering
@@ -163,8 +163,8 @@ def main(params: Inputs, context: Context) -> Outputs:
                 print(f"[PDF-to-EPUB] All {total_pages} pages converted successfully!")
       
 
-    # Get OCR model size (default to gundam for best quality)
-    ocr_model = params.get("ocr_model", "gundam")
+    # Get OCR model size (default to base)
+    ocr_model = params.get("ocr_model", "base")
 
     # Perform the conversion
     transform_epub(

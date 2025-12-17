@@ -9,8 +9,7 @@ class Inputs(typing.TypedDict):
     optimization_level: typing.Literal["balanced", "quality"] | None
     gpu_memory_fraction: float | None
 class Outputs(typing.TypedDict):
-    markdown_path: typing.NotRequired[str]
-    assets_dir: typing.NotRequired[str]
+    zip_path: typing.NotRequired[str]
 #endregion
 
 from pathlib import Path
@@ -18,6 +17,7 @@ from oocana import Context
 import torch
 import math
 import os
+import zipfile
 
 from pdf_craft import transform_markdown, OCREventKind
 
@@ -288,7 +288,24 @@ def main(params: Inputs, context: Context) -> Outputs:
         on_ocr_event=on_ocr_event,
     )
 
+    # Create zip archive containing markdown and assets
+    zip_path = output_dir / f"{markdown_path.stem}.zip"
+    print(f"[PDF-to-Markdown] Creating zip archive at {zip_path}")
+
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        # Add markdown file
+        zipf.write(markdown_path, markdown_path.name)
+
+        # Add all files from assets directory if it exists
+        if assets_dir.exists():
+            for file_path in assets_dir.rglob('*'):
+                if file_path.is_file():
+                    # Create relative path for zip archive
+                    arcname = Path("images") / file_path.relative_to(assets_dir)
+                    zipf.write(file_path, arcname)
+
+    print(f"[PDF-to-Markdown] Zip archive created successfully")
+
     return {
-        "markdown_path": str(markdown_path),
-        "assets_dir": str(assets_dir)
+        "zip_path": str(zip_path)
     }

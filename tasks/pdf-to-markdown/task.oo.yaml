@@ -74,13 +74,8 @@ inputs_def:
     nullable: true
 
 outputs_def:
-  - handle: markdown_path
-    description: "Path to the generated markdown file"
-    json_schema:
-      type: string
-
-  - handle: assets_dir
-    description: "Directory containing the extracted images and assets"
+  - handle: zip_path
+    description: "Path to the zip archive containing markdown and all assets"
     json_schema:
       type: string
 
