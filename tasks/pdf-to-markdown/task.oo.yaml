@@ -7,7 +7,7 @@ inputs_def:
     nullable: false
 
   - group: Optional
-    collapsed: true
+    collapsed: false
 
   - handle: output_path
     description: "%destination-path-where-the-converted-markdown-file-will-be-saved%"
