@@ -1,8 +1,19 @@
 {
-  "view": {
-    "pdf-to-markdown#1": {
-      "x": 100,
-      "y": 100
+  "nodes": {
+    "pdf-to-epub#2": {
+      "rfNode": {
+        "position": {
+          "x": -46.58330899477005,
+          "y": 111.41666567325592
+        }
+      },
+      "sections": {
+        "inputs": {
+          "groupCollapsed": {
+            "Optional": true
+          }
+        }
+      }
     }
   }
 }

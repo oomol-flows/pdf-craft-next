@@ -7,7 +7,7 @@ class Inputs(typing.TypedDict):
     ocr_model: typing.Literal["gundam", "large", "base", "small", "tiny"] | None
     book_title: str | None
     book_authors: str | None
-    table_render: typing.Literal["HTML", "Markdown"] | None
+    table_render: typing.Literal["HTML", "CLIPPING"] | None
     latex_render: typing.Literal["MathML", "LaTeX"] | None
     generate_plot: bool | None
 class Outputs(typing.TypedDict):
@@ -108,11 +108,11 @@ def main(params: Inputs, context: Context) -> Outputs:
 
     # Configure table rendering
     table_render_str = params.get("table_render", "HTML")
-    table_render = TableRender.HTML if table_render_str == "HTML" else TableRender.MARKDOWN
+    table_render = TableRender.HTML if table_render_str == "HTML" else TableRender.CLIPPING
 
     # Configure LaTeX rendering
     latex_render_str = params.get("latex_render", "MathML")
-    latex_render = LaTeXRender.MATHML if latex_render_str == "MathML" else LaTeXRender.LATEX
+    latex_render = LaTeXRender.MATHML if latex_render_str == "MathML" else LaTeXRender.CLIPPING
 
     # Configure book metadata (optional)
     book_title = params.get("book_title")
@@ -164,7 +164,7 @@ def main(params: Inputs, context: Context) -> Outputs:
       
 
     # Get OCR model size (default to base)
-    ocr_model = params.get("ocr_model", "base")
+    ocr_model = params.get("ocr_model") or "base"
 
     # Perform the conversion
     transform_epub(

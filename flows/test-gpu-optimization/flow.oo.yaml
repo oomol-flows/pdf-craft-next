@@ -1,19 +1,27 @@
 title: "%test-gpu-optimization-levels%"
 description: "%testing-workflow-for-evaluating-different-gpu-optimization-confi%"
 nodes:
-  - node_id: pdf-to-markdown#1
-    task: self::pdf-to-markdown
+  - node_id: pdf-to-epub#2
+    title: "PDF 转 EPUB #2"
     inputs_from:
       - handle: pdf_path
-      - handle: includes_footnotes
-        value: true
-      - handle: generate_plot
-        value: false
-      - handle: optimization_level
-        value:
-      - handle: gpu_memory_fraction
-        value: 0.9
-      - handle: ocr_size
-        value: base
+        value: /oomol-driver/oomol-storage/pdf/2024_The neurotransmitter calcitonin
+          gene-related peptide shapes an immunosuppressive microenvironment in
+          medullary thyroid cancer.pdf
       - handle: output_path
-        value:
+        value: null
+      - handle: includes_footnotes
+        value: null
+      - handle: ocr_model
+        value: null
+      - handle: book_title
+        value: null
+      - handle: book_authors
+        value: null
+      - handle: table_render
+        value: null
+      - handle: latex_render
+        value: null
+      - handle: generate_plot
+        value: null
+    task: self::pdf-to-epub

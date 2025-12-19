@@ -7,7 +7,7 @@ inputs_def:
     nullable: false
 
   - group: Optional
-    collapsed: true
+    collapsed: false
 
   - handle: output_path
     description: "%destination-path-where-the-converted-epub-file-will-be-saved-if%"
@@ -63,7 +63,7 @@ inputs_def:
       type: string
       enum:
         - HTML
-        - Markdown
+        - CLIPPING
     value:
     nullable: true
 
