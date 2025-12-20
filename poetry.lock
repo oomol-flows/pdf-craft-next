@@ -288,14 +288,14 @@ tests = ["pytest", "pytest-cov", "pytest-xdist"]
 
 [[package]]
 name = "doc-page-extractor"
-version = "1.0.10"
+version = "1.0.12"
 description = "Document page extraction tool powered by DeepSeek-OCR"
 optional = false
 python-versions = "<3.14,>=3.10"
 groups = ["main"]
 files = [
-    {file = "doc_page_extractor-1.0.10-py3-none-any.whl", hash = "sha256:ad322309a3072bd44b4150948080f9e254b6a6c4dbe1da9322cb32cbc4def192"},
-    {file = "doc_page_extractor-1.0.10.tar.gz", hash = "sha256:63f1aab3a2127f7ca4074db31de85ada87c49e47a4b4477dd798467816f38366"},
+    {file = "doc_page_extractor-1.0.12-py3-none-any.whl", hash = "sha256:6bd5b4203d39c0544082de611c36f17d37be5eabac0ba8061b9c692cb410bcdb"},
+    {file = "doc_page_extractor-1.0.12.tar.gz", hash = "sha256:28d45f2f48a3a61801512bd9a919fb1860632f0291ffbbeb8016c53322589ae9"},
 ]
 
 [package.dependencies]
@@ -332,14 +332,14 @@ files = [
 
 [[package]]
 name = "epub-generator"
-version = "0.1.2"
+version = "0.1.5"
 description = "A simple Python EPUB 3.0 generator with a single API call"
 optional = false
 python-versions = "<3.14,>=3.10"
 groups = ["main"]
 files = [
-    {file = "epub_generator-0.1.2-py3-none-any.whl", hash = "sha256:c7e510cb7e8999dc7250c1642d984470cc28e072a5a665abbf02a676878d7ee8"},
-    {file = "epub_generator-0.1.2.tar.gz", hash = "sha256:69f8c03fea19eb2469efe6dd571e6fd8d49a268576472e11d883ae24284d0e1e"},
+    {file = "epub_generator-0.1.5-py3-none-any.whl", hash = "sha256:c979e62dd8a84603b41cdcb7d2e8ff64b096f1e490b77353b286d2ad2900e99b"},
+    {file = "epub_generator-0.1.5.tar.gz", hash = "sha256:2b6eeb9c936f8ae1808a9b0eeca6cbdc00742a92894468c282813fbde9c82018"},
 ]
 
 [package.dependencies]
@@ -1219,20 +1219,21 @@ files = [
 
 [[package]]
 name = "pdf-craft"
-version = "1.0.3"
+version = "1.0.5"
 description = "PDF craft can convert PDF files into various other formats. This project will focus on processing PDF files of scanned books."
 optional = false
 python-versions = "<3.14,>=3.10"
 groups = ["main"]
 files = [
-    {file = "pdf_craft-1.0.3-py3-none-any.whl", hash = "sha256:5ad94ef88b0a9e9b4fbaee4ea874c5c3d2b9645ac1c0dcb8481049fe3c5289aa"},
-    {file = "pdf_craft-1.0.3.tar.gz", hash = "sha256:b86d1a49191df3bcd9623d462e4fcef4bd1306eec69d3209e4930761129b35c9"},
+    {file = "pdf_craft-1.0.5-py3-none-any.whl", hash = "sha256:1131e3db83c3c8b1eccb51822ae9ef89781b2e7792bc0822b79ca9372539e8cf"},
+    {file = "pdf_craft-1.0.5.tar.gz", hash = "sha256:8d9ac705feb50dd74ba309df3e600e74131888a3bee5a820504be78a214fabe9"},
 ]
 
 [package.dependencies]
-doc-page-extractor = "1.0.10"
-epub-generator = "0.1.2"
+doc-page-extractor = "1.0.12"
+epub-generator = "0.1.5"
 pdf2image = ">=1.17.0,<2.0.0"
+pyahocorasick = ">=2.2.0,<3.0.0"
 pylatexenc = ">=2.10,<3.0"
 pypdf = ">=6.4.1,<7.0.0"
 
@@ -1392,6 +1393,45 @@ files = [
 [package.extras]
 dev = ["abi3audit", "black", "check-manifest", "colorama ; os_name == \"nt\"", "coverage", "packaging", "pylint", "pyperf", "pypinfo", "pyreadline ; os_name == \"nt\"", "pytest", "pytest-cov", "pytest-instafail", "pytest-subtests", "pytest-xdist", "pywin32 ; os_name == \"nt\" and platform_python_implementation != \"PyPy\"", "requests", "rstcheck", "ruff", "setuptools", "sphinx", "sphinx_rtd_theme", "toml-sort", "twine", "validate-pyproject[all]", "virtualenv", "vulture", "wheel", "wheel ; os_name == \"nt\" and platform_python_implementation != \"PyPy\"", "wmi ; os_name == \"nt\" and platform_python_implementation != \"PyPy\""]
 test = ["pytest", "pytest-instafail", "pytest-subtests", "pytest-xdist", "pywin32 ; os_name == \"nt\" and platform_python_implementation != \"PyPy\"", "setuptools", "wheel ; os_name == \"nt\" and platform_python_implementation != \"PyPy\"", "wmi ; os_name == \"nt\" and platform_python_implementation != \"PyPy\""]
+
+[[package]]
+name = "pyahocorasick"
+version = "2.3.0"
+description = "pyahocorasick is a fast and memory efficient library for exact or approximate multi-pattern string search.  With the ``ahocorasick.Automaton`` class, you can find multiple key string occurrences at once in some input text.  You can use it as a plain dict-like Trie or convert a Trie to an automaton for efficient Aho-Corasick search. And pickle to disk for easy reuse of large automatons. Implemented in C and tested on Python 3.6+. Works on Linux, macOS and Windows. BSD-3-Cause license."
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "pyahocorasick-2.3.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d16b9ab607814968d047e26871653992240f0128ffc5d142922929afaea3bcdf"},
+    {file = "pyahocorasick-2.3.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:c1138b8f802e8f9aefd74c73314593a3e470cc5547fc4fe1d381426f31e2a264"},
+    {file = "pyahocorasick-2.3.0-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:cf22b22278c2352b9c2ace3d44842b9bfc2c220accbd744bbec3204b9d78f3c3"},
+    {file = "pyahocorasick-2.3.0-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:668dae5f54a20ac94521c30290beadb6b941cda9aaed4ef939fd16a393c65871"},
+    {file = "pyahocorasick-2.3.0-cp310-cp310-win_amd64.whl", hash = "sha256:265e71e2635a7ddd2019a5d9f1815642c9e6d24081dcc6d728d9040d9702739f"},
+    {file = "pyahocorasick-2.3.0-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:3f15f8cd42e6d8164f5621e2acd768a58854740f1796a1649f91485505da4776"},
+    {file = "pyahocorasick-2.3.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:8a1cbd603d471e118a60f780f2b4d83a35975d71a1745419854e722dfa7fadfc"},
+    {file = "pyahocorasick-2.3.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:41ec7f66d2fd5452d9d5e2f4ca919401981b0f52e7f1b0c2a9b7b30163ea86ea"},
+    {file = "pyahocorasick-2.3.0-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:2fb0b6fedec6558e7c8cd9397131325b03db72b2683b7abede3a37ae87150ae6"},
+    {file = "pyahocorasick-2.3.0-cp311-cp311-win_amd64.whl", hash = "sha256:0eae7c9fb67109649d653c20e163ae2ac33686ff266718c3bf12392cde8a42b6"},
+    {file = "pyahocorasick-2.3.0-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:7abfe09f6dca8656cc3d1122b25ea0caf272916c18a6e5a6a45ae74aa325a7fe"},
+    {file = "pyahocorasick-2.3.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:e7917f513aef244465e2e6a0ae1b5690e971dc336a7b15f68de2f03869d68302"},
+    {file = "pyahocorasick-2.3.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:dc9423ffaae542cfaeed516045576968a5ce6203a6f03d0034fcedbcabcb48cd"},
+    {file = "pyahocorasick-2.3.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:c0c42322518c99c49623a1784d27ae73a2765251955808e2edd64fd151e6fa57"},
+    {file = "pyahocorasick-2.3.0-cp312-cp312-win_amd64.whl", hash = "sha256:b417241fb8483a2b269502cdca5c69bd71579c11adb982663d61466936086fff"},
+    {file = "pyahocorasick-2.3.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:a0ed6066cc97e1277801f64f7633d85db4778801b3e775e0addf2e300e2e25bc"},
+    {file = "pyahocorasick-2.3.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:6623f2b395f2c32a5e65b780254eaca5ab8defa4f7819ebcdd68f1c98a761e25"},
+    {file = "pyahocorasick-2.3.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:28306dd19224b572f82d46d4831d6240770237e7188e9f9f3b267592f31af211"},
+    {file = "pyahocorasick-2.3.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:05777c88934df56044927aef1239917d7bbfebe4460ff953924c9d177f574098"},
+    {file = "pyahocorasick-2.3.0-cp313-cp313-win_amd64.whl", hash = "sha256:52116146fea2331bc0714fef229648f05d8f2451f08d29389eb9833ebddcfc72"},
+    {file = "pyahocorasick-2.3.0-cp314-cp314-macosx_10_15_universal2.whl", hash = "sha256:d4cca977f05a18c926a1d0dca05916825dd8923100e47e44d0735d8a949cc9d4"},
+    {file = "pyahocorasick-2.3.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:cc53e4fe83fae539ceae2252e289fe0875db6aec12d07444368903e4dd074291"},
+    {file = "pyahocorasick-2.3.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:f0326076ee2049822ca434529baf2c0b0d31886892d4ebfcfa5f0f64d307c6f0"},
+    {file = "pyahocorasick-2.3.0-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:9dee08a895eaa39712b65d2efe88b8aa642e07c1bd621a8f9056beb7001f1539"},
+    {file = "pyahocorasick-2.3.0-cp314-cp314-win_amd64.whl", hash = "sha256:0c6d9379ddf58cad4abd661795b4b975ba9b542227e78de6ded80757c3ac599d"},
+    {file = "pyahocorasick-2.3.0.tar.gz", hash = "sha256:2960f5838bbcca4d7765c40478ec56f938e3f161946ff84f00c06d2b3a0ba9dd"},
+]
+
+[package.extras]
+testing = ["pytest", "setuptools", "twine", "wheel"]
 
 [[package]]
 name = "pylatexenc"
@@ -2057,4 +2097,4 @@ zstd = ["backports-zstd (>=1.0.0) ; python_version < \"3.14\""]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "b9bf23514de0e2efcbb339b57084a00701ede8640f0c32d71887a3719bb446b4"
+content-hash = "456fe02b0ba9cb21ba375a981ed4b902da37f63a43d96269e5210c0bee5595d4"
