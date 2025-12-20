@@ -19,6 +19,31 @@ from oocana import Context
 from pdf_craft import transform_epub, OCREventKind, TableRender, LaTeXRender, BookMeta
 import torch
 import math
+import os
+
+# Enable PyTorch performance optimizations for NVIDIA GPUs (RTX 3060 12GB optimized)
+# These settings significantly improve GPU utilization on Ampere architecture
+torch.backends.cuda.matmul.allow_tf32 = True  # Enable TensorFloat-32 for matrix operations
+torch.backends.cudnn.allow_tf32 = True        # Enable TF32 for cuDNN operations
+torch.backends.cudnn.benchmark = True          # Enable cuDNN auto-tuner for optimal performance
+
+# Additional CUDA optimizations for RTX 3060
+torch.set_float32_matmul_precision('high')     # Use TF32 for float32 operations
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'  # Better memory management
+
+
+def apply_model_optimizations():
+    """
+    Apply optimizations to pdf_craft models for RTX 3060 12GB.
+
+    Note: torch.compile() is disabled because it breaks the model's .infer() method
+    which is required by pdf_craft's internal implementation. Instead, we rely on:
+    - TF32 matrix operations (enabled globally)
+    - cuDNN optimizations (enabled globally)
+    - Efficient memory management
+    """
+    print(f"[PDF-to-EPUB] GPU optimizations enabled: TF32 + cuDNN benchmark (RTX 3060 12GB)")
+    print(f"[PDF-to-EPUB] Note: torch.compile() disabled to preserve model compatibility")
 
 
 def safe_progress_value(value):
@@ -61,18 +86,13 @@ def main(params: Inputs, context: Context) -> Outputs:
             "Please ensure you have a compatible GPU and CUDA drivers installed."
         )
 
-    # Enable GPU performance optimizations
-    # Enable cuDNN benchmark mode for automatic algorithm selection
-    torch.backends.cudnn.benchmark = True
-    # Enable TF32 for faster computation on Ampere GPUs (RTX 30xx/40xx)
-    torch.backends.cuda.matmul.allow_tf32 = True
-    torch.backends.cudnn.allow_tf32 = True
-    # Set memory allocation strategy for better GPU utilization
-    torch.cuda.empty_cache()
+    # Apply model optimizations for RTX 3060 12GB
+    apply_model_optimizations()
 
-    # Log GPU information
+    # Log GPU information with optimization settings
     gpu_name = torch.cuda.get_device_name(0)
     cuda_version = torch.version.cuda
+    print(f"[PDF-to-EPUB] Using GPU: {gpu_name} (CUDA {cuda_version}) | TF32 + cuDNN optimized (RTX 3060 12GB)")
     context.report_progress(0)
 
     # Convert paths to Path objects

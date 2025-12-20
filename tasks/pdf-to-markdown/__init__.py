@@ -35,6 +35,7 @@ os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'  # Better mem
 def setup_optimization(optimization_level: str, gpu_memory_fraction: float):
     """
     Configure GPU optimization settings based on the specified level.
+    Optimized for RTX 3060 12GB.
 
     Parameters:
         optimization_level: One of 'balanced' or 'quality'
@@ -43,7 +44,7 @@ def setup_optimization(optimization_level: str, gpu_memory_fraction: float):
     Returns:
         dict: Configuration settings for pdf_craft
     """
-    # Set GPU memory fraction
+    # Set GPU memory fraction (RTX 3060 12GB optimized)
     if gpu_memory_fraction < 1.0:
         torch.cuda.set_per_process_memory_fraction(gpu_memory_fraction)
 
@@ -56,7 +57,8 @@ def setup_optimization(optimization_level: str, gpu_memory_fraction: float):
         config["dtype"] = torch.float16
 
     elif optimization_level == "balanced":
-        # Recommended: bfloat16 for better numerical stability
+        # Recommended for RTX 3060: bfloat16 for better numerical stability
+        # Ampere architecture has native bfloat16 support
         config["dtype"] = torch.bfloat16
 
     return config
@@ -66,7 +68,15 @@ def apply_model_optimizations(config: dict):
     """
     Apply optimizations to pdf_craft models via monkey patching.
 
-    This function patches the model loading process to apply dtype conversion.
+    This function patches the model loading process to apply dtype conversion
+    for RTX 3060 12GB.
+
+    Note: torch.compile() is disabled because it breaks the model's .infer() method
+    which is required by pdf_craft's internal implementation. Instead, we rely on:
+    - Dtype optimization (bfloat16/float16)
+    - TF32 matrix operations (enabled globally)
+    - cuDNN optimizations (enabled globally)
+    - Efficient memory management
 
     Parameters:
         config: Configuration dict from setup_optimization()
@@ -94,6 +104,7 @@ def apply_model_optimizations(config: dict):
             else:
                 print(f"[PDF-to-Markdown] Model {idx} using {target_dtype} (no conversion needed)")
 
+        print(f"[PDF-to-Markdown] Note: torch.compile() disabled to preserve model compatibility")
         return result
 
     # Apply the monkey patch
@@ -161,9 +172,9 @@ def main(params: Inputs, context: Context) -> Outputs:
             "Please ensure you have a compatible GPU and CUDA drivers installed."
         )
 
-    # Get optimization parameters
+    # Get optimization parameters (RTX 3060 12GB optimized defaults)
     optimization_level = params.get("optimization_level", "balanced")
-    gpu_memory_fraction = params.get("gpu_memory_fraction", 0.9)
+    gpu_memory_fraction = params.get("gpu_memory_fraction", 0.85)  # RTX 3060: 85% for stability
 
     # Setup GPU optimizations
     opt_config = setup_optimization(optimization_level, gpu_memory_fraction)
@@ -175,10 +186,10 @@ def main(params: Inputs, context: Context) -> Outputs:
     gpu_name = torch.cuda.get_device_name(0)
     cuda_version = torch.version.cuda
     dtype_name = "bfloat16" if opt_config["dtype"] == torch.bfloat16 else "float16"
-    gpu_message = f"Using GPU: {gpu_name} (CUDA {cuda_version}) | Optimization: {optimization_level} ({dtype_name})"
+    gpu_message = f"Using GPU: {gpu_name} (CUDA {cuda_version}) | Optimization: {optimization_level} ({dtype_name}) + TF32 + cuDNN"
 
     # Log progress with business context
-    opt_context = f"GPU memory limit: {gpu_memory_fraction*100:.0f}% | Dtype: {dtype_name} | TF32: Enabled"
+    opt_context = f"GPU memory limit: {gpu_memory_fraction*100:.0f}% | Dtype: {dtype_name} | TF32: Enabled (RTX 3060 12GB)"
     log_progress_report(0, gpu_message, opt_context)
     context.report_progress(0)
 
